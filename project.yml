@@ -1,0 +1,52 @@
+name: WifiManager
+options:
+  bundleIdPrefix: com.vincent
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+  groupSortPosition: top
+  xcodeVersion: "16.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+    ENABLE_HARDENED_RUNTIME: NO
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    ENABLE_APP_SANDBOX: NO
+    SWIFT_STRICT_CONCURRENCY: minimal
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+
+targets:
+  WifiManager:
+    type: application
+    platform: macOS
+    sources:
+      - path: WifiManager/Sources
+      - path: WifiManager/Resources/Assets.xcassets
+        buildPhase: resources
+    info:
+      path: WifiManager/Info.plist
+      properties:
+        CFBundleDisplayName: WifiManager
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        LSMinimumSystemVersion: "13.0"
+        LSUIElement: true
+        NSHighResolutionCapable: true
+        NSPrincipalClass: NSApplication
+        NSSupportsAutomaticGraphicsSwitching: true
+        NSLocationWhenInUseUsageDescription: "WifiManager utilise votre localisation pour suggérer le meilleur réseau WiFi selon votre lieu."
+        NSLocationAlwaysAndWhenInUseUsageDescription: "WifiManager utilise votre localisation pour changer automatiquement de réseau WiFi selon votre lieu."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.vincent.WifiManager
+        PRODUCT_NAME: WifiManager
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        COMBINE_HIDPI_IMAGES: YES

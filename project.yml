@@ -49,7 +49,7 @@ targets:
         NSLocationWhenInUseUsageDescription: "WifiManager utilise votre localisation pour suggérer le meilleur réseau WiFi selon votre lieu."
         NSLocationAlwaysAndWhenInUseUsageDescription: "WifiManager utilise votre localisation pour changer automatiquement de réseau WiFi selon votre lieu."
         SUFeedURL: "https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/appcast.xml"
-        SUPublicEDKey: "REPLACE_WITH_GENERATED_KEY"
+        SUPublicEDKey: "fsT0Pbi8A8rd6ppCaWbnRMVy+YvJ+v/uVJxU78GqdW4="
         SUEnableAutomaticChecks: true
         SUScheduledCheckInterval: 86400
         SUAutomaticallyUpdate: false

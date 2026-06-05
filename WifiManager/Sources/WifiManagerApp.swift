@@ -50,23 +50,31 @@ private struct MenuBarIconView: View {
     let status: ConnectionStatus
 
     var body: some View {
-        HStack(spacing: 2) {
+        ZStack(alignment: .bottomTrailing) {
             Image(systemName: symbolName)
-                .symbolRenderingMode(.monochrome)
-                .foregroundStyle(status.iconColor)
-            if status.isHotspot {
-                Image(systemName: "personalhotspot")
-                    .font(.system(size: 7, weight: .bold))
-                    .foregroundStyle(.orange)
-                    .offset(y: 3)
-            }
+                .symbolRenderingMode(.hierarchical)
+
+            // SF Symbols in MenuBarExtra are forced to template (monochrome) by macOS.
+            // A SwiftUI shape bypasses that pipeline and preserves its fill color.
+            Circle()
+                .fill(dotColor)
+                .frame(width: 6, height: 6)
+                .offset(x: 2, y: 2)
         }
     }
 
     private var symbolName: String {
         switch status {
-        case .disconnected:         return "globe.slash"
-        case .hotspot, .wifi:       return "globe"
+        case .disconnected:     return "globe.slash"
+        case .hotspot, .wifi:   return "globe"
+        }
+    }
+
+    private var dotColor: Color {
+        switch status {
+        case .disconnected:         return .red
+        case .hotspot:              return .orange
+        case .wifi(let q):          return q.color
         }
     }
 }

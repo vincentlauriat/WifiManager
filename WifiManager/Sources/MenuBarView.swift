@@ -3,7 +3,9 @@ import SwiftUI
 struct MenuBarView: View {
     @EnvironmentObject var monitor: WiFiMonitor
     @EnvironmentObject var locationManager: LocationProfileManager
+    @EnvironmentObject var lang: LanguageManager
     @State private var showNetworkList = false
+    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -38,8 +40,8 @@ struct MenuBarView: View {
     private var actionButtons: some View {
         VStack(spacing: 0) {
             MenuActionRow(
-                icon: monitor.isReconnecting ? "arrow.trianglehead.2.clockwise.rotate.90" : "arrow.trianglehead.2.clockwise.rotate.90",
-                label: monitor.isReconnecting ? "Reconnexion en cours…" : "Relancer la connexion",
+                icon: "arrow.trianglehead.2.clockwise.rotate.90",
+                label: monitor.isReconnecting ? lang.s.reconnecting : lang.s.reconnect,
                 isLoading: monitor.isReconnecting
             ) {
                 Task { await monitor.reconnect() }
@@ -50,7 +52,7 @@ struct MenuBarView: View {
 
             MenuActionRow(
                 icon: "list.wifi",
-                label: "Réseaux disponibles",
+                label: lang.s.availableNetworks,
                 isLoading: monitor.isScanning,
                 trailing: {
                     AnyView(
@@ -78,14 +80,14 @@ struct MenuBarView: View {
             }
             Spacer()
             Button {
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                openSettings()
                 NSApp.activate(ignoringOtherApps: true)
             } label: {
                 Image(systemName: "gearshape")
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
-            .help("Préférences WifiManager")
+            .help(lang.s.preferencesHelp)
 
             Button {
                 NSApp.terminate(nil)
@@ -94,7 +96,7 @@ struct MenuBarView: View {
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
-            .help("Quitter WifiManager")
+            .help(lang.s.quit)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 7)

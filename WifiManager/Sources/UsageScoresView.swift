@@ -2,10 +2,11 @@ import SwiftUI
 
 struct UsageScoresView: View {
     let scores: [UsageType: NetworkQuality]
+    @EnvironmentObject var lang: LanguageManager
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Qualité par usage")
+            Text(lang.s.usageQualityTitle)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 12)
@@ -27,6 +28,7 @@ struct UsageScoresView: View {
 private struct UsageCell: View {
     let usage: UsageType
     let quality: NetworkQuality
+    @EnvironmentObject var lang: LanguageManager
 
     var body: some View {
         VStack(spacing: 3) {
@@ -43,11 +45,11 @@ private struct UsageCell: View {
                 }
                 .padding(.vertical, 6)
             }
-            Text(usage.displayName)
+            Text(lang.s.usageName(for: usage))
                 .font(.system(size: 10))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
-        .help("\(usage.displayName) : \(quality.label)")
+        .help("\(lang.s.usageName(for: usage)) : \(lang.s.qualityLabel(for: quality))")
     }
 }

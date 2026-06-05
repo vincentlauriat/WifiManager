@@ -7,6 +7,7 @@ extension CWNetwork: @retroactive Identifiable {
 
 struct NetworkListView: View {
     @EnvironmentObject var monitor: WiFiMonitor
+    @EnvironmentObject var lang: LanguageManager
     @State private var promptingID: String?
     @State private var passwordInput = ""
     @State private var failedID: String?
@@ -16,14 +17,14 @@ struct NetworkListView: View {
             if monitor.isScanning {
                 HStack(spacing: 8) {
                     ProgressView().scaleEffect(0.7)
-                    Text("Recherche des réseaux…")
+                    Text(lang.s.scanning)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
             } else if monitor.availableNetworks.isEmpty {
-                Text("Aucun réseau trouvé")
+                Text(lang.s.noNetworks)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
@@ -36,8 +37,6 @@ struct NetworkListView: View {
                         isPrompting: promptingID == network.id,
                         passwordInput: $passwordInput
                     ) {
-                        // Tente nil d'abord (keychain ou réseau ouvert)
-                        // Si échec → affiche le prompt mot de passe
                         Task {
                             failedID = nil
                             await monitor.connect(to: network)
@@ -85,6 +84,7 @@ private struct NetworkRow: View {
     let onTap: () -> Void
     let onConnect: (String) -> Void
     let onCancel: () -> Void
+    @EnvironmentObject var lang: LanguageManager
 
     var body: some View {
         VStack(spacing: 0) {
@@ -94,7 +94,7 @@ private struct NetworkRow: View {
                         .foregroundStyle(isCurrentNetwork ? Color.accentColor : .secondary)
                         .frame(width: 20)
 
-                    Text(network.ssid ?? "Réseau inconnu")
+                    Text(network.ssid ?? lang.s.unknownNetwork)
                         .font(.callout)
                         .lineLimit(1)
 
@@ -105,6 +105,12 @@ private struct NetworkRow: View {
                     }
 
                     Spacer()
+
+                    if !network.supportsSecurity(.none) {
+                        Image(systemName: "lock.fill")
+                            .foregroundStyle(.tertiary)
+                            .font(.caption)
+                    }
 
                     rssiLabel
                 }
@@ -117,11 +123,11 @@ private struct NetworkRow: View {
 
             if isPrompting {
                 HStack(spacing: 6) {
-                    SecureField("Mot de passe WiFi", text: $passwordInput)
+                    SecureField(lang.s.wifiPassword, text: $passwordInput)
                         .textFieldStyle(.roundedBorder)
                         .onSubmit { onConnect(passwordInput) }
 
-                    Button("Rejoindre") { onConnect(passwordInput) }
+                    Button(lang.s.join) { onConnect(passwordInput) }
                         .buttonStyle(.borderedProminent)
                         .controlSize(.small)
                         .disabled(passwordInput.isEmpty)

@@ -2,26 +2,27 @@ import SwiftUI
 
 struct MetricsView: View {
     let metrics: NetworkMetrics
+    @EnvironmentObject var lang: LanguageManager
 
     var body: some View {
         VStack(spacing: 7) {
             MetricRow(
                 icon: "antenna.radiowaves.left.and.right",
-                label: "Signal",
+                label: lang.s.signal,
                 value: "\(metrics.rssi) dBm",
                 bar: metrics.rssiBarValue,
                 color: signalColor
             )
             MetricRow(
                 icon: "timer",
-                label: "Latence",
+                label: lang.s.latency,
                 value: metrics.latency.map { String(format: "%.0f ms", $0) } ?? "—",
                 bar: metrics.latency.map { latencyBar($0) } ?? 0,
                 color: metrics.latency.map { latencyColor($0) } ?? .secondary
             )
             MetricRow(
                 icon: "speedometer",
-                label: "Débit lien",
+                label: lang.s.linkSpeed,
                 value: String(format: "%.0f Mbps", metrics.transmitRate),
                 bar: min(1.0, metrics.transmitRate / 600),
                 color: .blue
@@ -29,7 +30,7 @@ struct MetricsView: View {
             if metrics.snr > 0 {
                 MetricRow(
                     icon: "waveform.path.ecg",
-                    label: "SNR",
+                    label: lang.s.snr,
                     value: "\(metrics.snr) dB",
                     bar: min(1.0, Double(metrics.snr) / 40),
                     color: metrics.snr > 25 ? .green : metrics.snr > 15 ? .orange : .red

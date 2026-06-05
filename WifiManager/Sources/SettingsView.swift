@@ -1,14 +1,17 @@
 import SwiftUI
+import Sparkle
 
 struct SettingsView: View {
+    @EnvironmentObject var lang: LanguageManager
+
     var body: some View {
         TabView {
             GeneralTab()
-                .tabItem { Label("Général", systemImage: "gearshape") }
+                .tabItem { Label(lang.s.tabGeneral, systemImage: "gearshape") }
             LocationTab()
-                .tabItem { Label("Lieux", systemImage: "location") }
+                .tabItem { Label(lang.s.tabLocations, systemImage: "location") }
             AboutTab()
-                .tabItem { Label("À propos", systemImage: "info.circle") }
+                .tabItem { Label(lang.s.tabAbout, systemImage: "info.circle") }
         }
         .frame(width: 420, height: 320)
     }
@@ -22,28 +25,37 @@ private struct GeneralTab: View {
     @AppStorage("notifyOnDisconnect") private var notifyOnDisconnect = true
     @AppStorage("notifyOnHotspot") private var notifyOnHotspot = true
     @AppStorage("launchAtLogin") private var launchAtLogin = false
+    @EnvironmentObject var lang: LanguageManager
 
     var body: some View {
         Form {
-            Section("Surveillance") {
-                Picker("Vérification toutes les", selection: $pollInterval) {
+            Section(lang.s.monitoring) {
+                Picker(lang.s.pollIntervalLabel, selection: $pollInterval) {
                     Text("10 s").tag(10.0)
                     Text("30 s").tag(30.0)
                     Text("1 min").tag(60.0)
                     Text("5 min").tag(300.0)
                 }
-                Toggle("Afficher le badge Partage de connexion", isOn: $showHotspotBadge)
+                Toggle(lang.s.hotspotBadge, isOn: $showHotspotBadge)
             }
-            Section("Notifications") {
-                Toggle("Alerter si la connexion est perdue", isOn: $notifyOnDisconnect)
-                Toggle("Alerter si l'on passe sur un partage de connexion", isOn: $notifyOnHotspot)
+            Section(lang.s.notifications) {
+                Toggle(lang.s.notifyDisconnect, isOn: $notifyOnDisconnect)
+                Toggle(lang.s.notifyHotspot, isOn: $notifyOnHotspot)
             }
-            Section("Démarrage") {
-                Toggle("Lancer WifiManager au démarrage", isOn: $launchAtLogin)
+            Section(lang.s.startup) {
+                Toggle(lang.s.launchAtLogin, isOn: $launchAtLogin)
                     .disabled(true)
-                Text("Fonctionnalité disponible dans une prochaine version.")
+                Text(lang.s.launchAtLoginNote)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+            Section(lang.s.language) {
+                Picker(lang.s.language, selection: $lang.language) {
+                    ForEach(AppLanguage.allCases) { language in
+                        Text(language.displayName).tag(language)
+                    }
+                }
+                .pickerStyle(.segmented)
             }
         }
         .formStyle(.grouped)
@@ -55,8 +67,8 @@ private struct GeneralTab: View {
 
 private struct LocationTab: View {
     @EnvironmentObject var locationManager: LocationProfileManager
+    @EnvironmentObject var lang: LanguageManager
     @State private var showAdd = false
-    @State private var editingProfile: LocationProfile?
     @State private var newName = ""
     @State private var newSSID = ""
 
@@ -86,13 +98,16 @@ private struct LocationTab: View {
                     withAnimation { showAdd.toggle() }
                     newName = ""; newSSID = ""
                 } label: {
-                    Label(showAdd ? "Annuler" : "Ajouter un lieu", systemImage: showAdd ? "xmark" : "plus")
+                    Label(
+                        showAdd ? lang.s.cancel : lang.s.addLocation,
+                        systemImage: showAdd ? "xmark" : "plus"
+                    )
                 }
                 .buttonStyle(.bordered)
 
                 Spacer()
 
-                Text("\(locationManager.profiles.count) lieu(x) enregistré(s)")
+                Text(lang.s.locationsCountLabel(locationManager.profiles.count))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -105,10 +120,10 @@ private struct LocationTab: View {
         HStack(spacing: 8) {
             Image(systemName: "location.slash.fill")
                 .foregroundStyle(.orange)
-            Text("Localisation refusée — la détection automatique est désactivée.")
+            Text(lang.s.locationDenied)
                 .font(.caption)
             Spacer()
-            Button("Ouvrir Réglages") {
+            Button(lang.s.openSystemSettings) {
                 NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")!)
             }
             .controlSize(.small)
@@ -119,11 +134,11 @@ private struct LocationTab: View {
 
     private var addForm: some View {
         HStack(spacing: 8) {
-            TextField("Nom du lieu", text: $newName)
+            TextField(lang.s.locationName, text: $newName)
                 .textFieldStyle(.roundedBorder)
-            TextField("SSID WiFi", text: $newSSID)
+            TextField(lang.s.networkSSID, text: $newSSID)
                 .textFieldStyle(.roundedBorder)
-            Button("Ajouter") {
+            Button(lang.s.add) {
                 guard !newName.isEmpty, !newSSID.isEmpty else { return }
                 locationManager.add(profile: LocationProfile(name: newName, preferredSSID: newSSID))
                 newName = ""; newSSID = ""; showAdd = false
@@ -138,12 +153,13 @@ private struct LocationTab: View {
 
 private struct ProfileRow: View {
     let profile: LocationProfile
+    @EnvironmentObject var lang: LanguageManager
 
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(profile.name).font(.callout.weight(.medium))
-                Text("Réseau : \(profile.preferredSSID)")
+                Text("\(lang.s.preferredNetwork)\(profile.preferredSSID)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -161,6 +177,9 @@ private struct ProfileRow: View {
 // MARK: - About
 
 private struct AboutTab: View {
+    @EnvironmentObject var lang: LanguageManager
+    @EnvironmentObject var updaterWrapper: UpdaterWrapper
+
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: "wifi.circle.fill")
@@ -173,11 +192,16 @@ private struct AboutTab: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
 
-            Text("Surveille la qualité de votre connexion WiFi et distingue les réseaux réels des partages de connexion.")
+            Text(lang.s.appDescription)
                 .font(.callout)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 40)
+
+            Button(lang.s.checkForUpdates) {
+                updaterWrapper.updater.checkForUpdates()
+            }
+            .buttonStyle(.bordered)
 
             Spacer()
         }

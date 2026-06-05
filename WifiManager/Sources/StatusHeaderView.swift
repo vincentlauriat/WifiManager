@@ -2,6 +2,7 @@ import SwiftUI
 
 struct StatusHeaderView: View {
     @EnvironmentObject var monitor: WiFiMonitor
+    @EnvironmentObject var lang: LanguageManager
 
     var body: some View {
         HStack(spacing: 10) {
@@ -13,16 +14,16 @@ struct StatusHeaderView: View {
                         .font(.headline)
                     HStack(spacing: 4) {
                         if m.isExpensive {
-                            Label("Partage de connexion", systemImage: "personalhotspot")
+                            Label(lang.s.hotspot, systemImage: "personalhotspot")
                                 .font(.caption)
                                 .foregroundStyle(.orange)
                         } else {
-                            Text(monitor.status.statusLabel)
+                            Text(lang.s.statusLabel(for: monitor.status))
                                 .font(.caption)
                                 .foregroundStyle(monitor.status.iconColor)
                         }
                         if let ch = m.channel {
-                            Text("· Canal \(ch)")
+                            Text("· \(lang.s.channel(ch))")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -33,9 +34,9 @@ struct StatusHeaderView: View {
                         }
                     }
                 } else {
-                    Text("Non connecté")
+                    Text(lang.s.notConnected)
                         .font(.headline)
-                    Text("Aucun réseau WiFi actif")
+                    Text(lang.s.noActiveWifi)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -50,7 +51,7 @@ struct StatusHeaderView: View {
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
-            .help("Actualiser")
+            .help(lang.s.refresh)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -77,8 +78,8 @@ struct StatusHeaderView: View {
 
     private func updatedLabel(_ date: Date) -> String {
         let secs = Int(Date().timeIntervalSince(date))
-        if secs < 10 { return "à l'instant" }
-        if secs < 60 { return "il y a \(secs) s" }
-        return "il y a \(secs / 60) min"
+        if secs < 10 { return lang.s.justNow }
+        if secs < 60 { return lang.s.secsAgo(secs) }
+        return lang.s.minAgo(secs / 60)
     }
 }

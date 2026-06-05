@@ -1,9 +1,10 @@
 import CoreWLAN
 import Network
+import CoreLocation
 import SwiftUI
 
 @MainActor
-class WiFiMonitor: ObservableObject {
+class WiFiMonitor: NSObject, ObservableObject {
     @Published var status: ConnectionStatus = .disconnected
     @Published var metrics: NetworkMetrics?
     @Published var availableNetworks: [CWNetwork] = []
@@ -18,8 +19,15 @@ class WiFiMonitor: ObservableObject {
     private let qualityChecker = NetworkQualityChecker()
     private var pathMonitor: NWPathMonitor?
     private var pollTimer: Timer?
+    // Needed to unlock CWInterface.ssid() on macOS 14+
+    private let locationManager = CLLocationManager()
 
-    init() {
+    override init() {
+        super.init()
+        locationManager.delegate = self
+        if locationManager.authorizationStatus == .notDetermined {
+            locationManager.requestWhenInUseAuthorization()
+        }
         setupPathMonitor()
         Task { await refresh() }
         startPolling()
@@ -34,21 +42,33 @@ class WiFiMonitor: ObservableObject {
 
     func refresh() async {
         connectionError = nil
-        guard let interface = wifiClient.interface(),
-              interface.powerOn(),
-              let ssid = interface.ssid() else {
+
+        // NWPathMonitor est la source de vérité pour la connectivité
+        guard typeDetector.isConnected,
+              let interface = wifiClient.interface(),
+              interface.powerOn() else {
             status = .disconnected
             metrics = nil
             return
         }
 
+        let rssi = interface.rssiValue()
+        // RSSI 0 = interface active mais non associée à un AP
+        guard rssi != 0 else {
+            status = .disconnected
+            metrics = nil
+            return
+        }
+
+        // ssid() peut retourner nil sans permission localisation (macOS 14+)
+        let ssid = interface.ssid() ?? "WiFi"
         let isExpensive = typeDetector.isExpensive
         let latency = await qualityChecker.measureLatency()
 
         let m = NetworkMetrics(
             ssid: ssid,
             bssid: interface.bssid(),
-            rssi: interface.rssiValue(),
+            rssi: rssi,
             noise: interface.noiseMeasurement(),
             transmitRate: interface.transmitRate(),
             channel: interface.wlanChannel()?.channelNumber,
@@ -156,5 +176,12 @@ class WiFiMonitor: ObservableObject {
                 try? interface.associate(to: network, password: nil)
             }
         } catch {}
+    }
+}
+
+// Relaie le SSID dès que la permission localisation est accordée
+extension WiFiMonitor: CLLocationManagerDelegate {
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        Task { @MainActor in await self.refresh() }
     }
 }

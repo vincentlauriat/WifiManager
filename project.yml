@@ -2,11 +2,16 @@ name: WifiManager
 options:
   bundleIdPrefix: com.vincent
   deploymentTarget:
-    macOS: "13.0"
+    macOS: "14.0"
   createIntermediateGroups: true
   generateEmptyDirectories: true
   groupSortPosition: top
   xcodeVersion: "16.0"
+
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.9.1"
 
 settings:
   base:
@@ -18,7 +23,7 @@ settings:
     ENABLE_USER_SCRIPT_SANDBOXING: NO
     ENABLE_APP_SANDBOX: NO
     SWIFT_STRICT_CONCURRENCY: minimal
-    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
 
 targets:
   WifiManager:
@@ -28,19 +33,26 @@ targets:
       - path: WifiManager/Sources
       - path: WifiManager/Resources/Assets.xcassets
         buildPhase: resources
+    dependencies:
+      - package: Sparkle
     info:
       path: WifiManager/Info.plist
       properties:
         CFBundleDisplayName: WifiManager
         CFBundleShortVersionString: "1.0.0"
         CFBundleVersion: "1"
-        LSMinimumSystemVersion: "13.0"
+        LSMinimumSystemVersion: "14.0"
         LSUIElement: true
         NSHighResolutionCapable: true
         NSPrincipalClass: NSApplication
         NSSupportsAutomaticGraphicsSwitching: true
         NSLocationWhenInUseUsageDescription: "WifiManager utilise votre localisation pour suggérer le meilleur réseau WiFi selon votre lieu."
         NSLocationAlwaysAndWhenInUseUsageDescription: "WifiManager utilise votre localisation pour changer automatiquement de réseau WiFi selon votre lieu."
+        SUFeedURL: "https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/appcast.xml"
+        SUPublicEDKey: "REPLACE_WITH_GENERATED_KEY"
+        SUEnableAutomaticChecks: true
+        SUScheduledCheckInterval: 86400
+        SUAutomaticallyUpdate: false
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.vincent.WifiManager

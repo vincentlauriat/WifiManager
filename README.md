@@ -1,89 +1,131 @@
 # WifiManager
 
-Application macOS de surveillance WiFi dans la barre de menu.
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)
+![Swift](https://img.shields.io/badge/swift-5.9-orange)
 
-## Fonctionnalités
+A lightweight macOS menu bar app that monitors your WiFi connection quality in real time, distinguishes real networks from iPhone hotspots, and scores connection suitability per use case.
 
-- **Icône de statut** : rouge (déconnecté), orange (problèmes), verte (tout va bien)
-- **Métriques temps réel** : RSSI, latence, débit du lien, SNR
-- **Scores par usage** : e-mail, navigation, visio (Teams/Meet), gaming, streaming
-- **Reconnexion en un clic** : déconnecte et reconnecte au même réseau
-- **Scan des réseaux** : liste les réseaux disponibles avec force du signal et cadenas si sécurisé
-- **Changement de réseau** : connexion directe depuis le popover (avec saisie du mot de passe intégrée)
-- **Détection partage de connexion** : distingue un vrai WiFi d'un partage iPhone/Android (`NWPath.isExpensive`)
-- **Profils de lieux** : associe un SSID préféré à un lieu (maison, bureau…), avec détection automatique via CoreLocation
+> **Screenshot coming soon**
 
-## Pile technique
+---
 
-| Composant | Technologie |
+## Features
+
+| Feature | Description |
 |---|---|
-| UI | SwiftUI + MenuBarExtra |
-| WiFi | CoreWLAN (CWWiFiClient) |
-| Connectivité | Network.framework (NWPathMonitor) |
-| Localisation | CoreLocation |
-| macOS minimum | 13.0 |
-| Langage | Swift 5.9+ |
+| Live signal metrics | RSSI, latency, link speed, SNR with animated bars |
+| Hotspot detection | Automatically detects iPhone Personal Hotspot via `NWPathMonitor` |
+| Usage scores | Per-use quality rating: Email, Browsing, Video Call, Gaming, Streaming |
+| Network scanner | Lists nearby WiFi networks; join directly with password prompt |
+| Location profiles | Save location/SSID pairs for automatic network suggestions |
+| FR / EN interface | Language switcher in Preferences → General |
+| Auto-update | Sparkle 2 integration with appcast feed |
+| Menu bar icon | Color-coded globe icon (green / orange / red) + hotspot badge |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| UI | SwiftUI (macOS 14+) |
+| WiFi scanning | CoreWLAN (`CWWiFiClient`) |
+| Network path | Network framework (`NWPathMonitor`) |
+| Location | CoreLocation |
+| Auto-update | [Sparkle 2](https://sparkle-project.org) |
+| Project generation | [XcodeGen](https://github.com/yonaskolb/XcodeGen) |
+
+---
 
 ## Installation
 
-### Prérequis
+### Requirements
 
+- macOS 14.0 Sonoma or later
 - Xcode 16+
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`)
+
+### Build from source
 
 ```bash
-brew install xcodegen
-```
-
-### Générer le projet et compiler
-
-```bash
+git clone https://github.com/vincentlauriat/WifiManager.git
 cd WifiManager
 xcodegen generate
 open WifiManager.xcodeproj
 ```
 
-Puis **Cmd+R** dans Xcode.
+Or use the build script:
 
-## Structure du projet
+```bash
+bash Scripts/build.sh
+```
+
+---
+
+## Project Layout
 
 ```
 WifiManager/
-├── project.yml                   # Configuration XcodeGen (source de vérité)
-├── ARCHITECTURE.md               # Architecture détaillée
-├── TODOS.md                      # Tâches en cours
-├── WifiManager/
-│   ├── Sources/
-│   │   ├── WifiManagerApp.swift          # @main + MenuBarExtra
-│   │   ├── NetworkStatus.swift           # Modèles de statut
-│   │   ├── UsageProfile.swift            # Profils d'usage
-│   │   ├── LocationProfile.swift         # Modèle de lieu
-│   │   ├── WiFiMonitor.swift             # Service de surveillance central
-│   │   ├── NetworkQualityChecker.swift   # Tests de latence
-│   │   ├── ConnectionTypeDetector.swift  # Détection hotspot
-│   │   ├── LocationProfileManager.swift  # Gestion des profils de lieux
-│   │   ├── MenuBarView.swift             # Popover principal
-│   │   ├── StatusHeaderView.swift        # En-tête avec badge coloré
-│   │   ├── MetricsView.swift             # Barres de métriques
-│   │   ├── UsageScoresView.swift         # Grille de scores par usage
-│   │   ├── NetworkListView.swift         # Liste des réseaux disponibles
-│   │   └── SettingsView.swift            # Fenêtre de préférences
-│   └── Resources/
-│       └── Assets.xcassets/
-└── .gitignore
+├── project.yml                  # XcodeGen project spec
+├── Scripts/
+│   └── build.sh                 # Convenience build script
+└── WifiManager/
+    ├── Info.plist
+    ├── Resources/
+    │   └── Assets.xcassets/
+    └── Sources/
+        ├── AppLanguage.swift        # Language enum + LanguageManager
+        ├── Strings.swift            # All localised strings (FR/EN)
+        ├── WifiManagerApp.swift     # App entry point, Sparkle setup
+        ├── WiFiMonitor.swift        # CoreWLAN + NWPathMonitor actor
+        ├── NetworkStatus.swift      # ConnectionStatus, NetworkQuality, NetworkMetrics
+        ├── NetworkQualityChecker.swift
+        ├── ConnectionTypeDetector.swift
+        ├── UsageProfile.swift       # UsageType with per-usage quality scoring
+        ├── LocationProfile.swift
+        ├── LocationProfileManager.swift
+        ├── MenuBarView.swift
+        ├── StatusHeaderView.swift
+        ├── MetricsView.swift
+        ├── UsageScoresView.swift
+        ├── NetworkListView.swift
+        └── SettingsView.swift
 ```
+
+---
+
+## How Auto-Update Works
+
+WifiManager uses [Sparkle 2](https://sparkle-project.org) for automatic update checks.
+
+1. On launch, Sparkle checks the appcast feed at:
+   `https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/appcast.xml`
+2. If a newer version is available, a system alert prompts the user.
+3. Updates are **not** downloaded automatically (`SUAutomaticallyUpdate = false`).
+4. The user can also trigger a check manually via **Preferences → About → Check for Updates…**
+
+To publish a new release, update `appcast.xml` at the repo root with the new version entry and a signed `.dmg` or `.zip` asset.
+
+---
 
 ## Roadmap
 
-- [x] Icône barre de menu rouge/orange/vert
-- [x] Métriques RSSI, latence, débit, SNR
-- [x] Scores par usage (mail, navigation, visio, gaming, streaming)
-- [x] Reconnexion en un clic
-- [x] Scan et changement de réseau WiFi
-- [x] Détection partage de connexion vs WiFi réel
-- [x] Profils de lieux avec CoreLocation
-- [ ] Historique de connexion (graphe temporel)
-- [ ] Test de débit réel (upload/download)
-- [ ] Notifications système (déconnexion, dégradation)
-- [ ] Lancement au démarrage (LaunchAgent)
-- [ ] Export des métriques CSV
+- [x] Real-time WiFi metrics (RSSI, latency, SNR, link speed)
+- [x] Hotspot detection
+- [x] Usage quality scores
+- [x] Network scanner with password join
+- [x] Location profiles
+- [x] FR / EN localisation
+- [x] Sparkle auto-update
+- [ ] Launch at login (ServiceManagement)
+- [ ] Download speed measurement
+- [ ] Notification center alerts on disconnect / hotspot switch
+- [ ] iCloud sync for location profiles
+- [ ] Menu bar widget (macOS 15+)
+
+---
+
+## License
+
+MIT — see `LICENSE` file (coming soon).

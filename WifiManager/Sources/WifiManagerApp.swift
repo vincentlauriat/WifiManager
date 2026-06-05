@@ -1,15 +1,36 @@
 import SwiftUI
+import Sparkle
+
+final class UpdaterWrapper: ObservableObject {
+    let updater: SPUUpdater
+
+    init(controller: SPUStandardUpdaterController) {
+        self.updater = controller.updater
+    }
+}
 
 @main
 struct WifiManagerApp: App {
     @StateObject private var monitor = WiFiMonitor()
     @StateObject private var locationManager = LocationProfileManager()
+    @StateObject private var langManager = LanguageManager()
+
+    private let updaterController: SPUStandardUpdaterController = {
+        let c = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+        c.updater.automaticallyChecksForUpdates = true
+        c.updater.automaticallyDownloadsUpdates = false
+        return c
+    }()
+
+    private var updaterWrapper: UpdaterWrapper { UpdaterWrapper(controller: updaterController) }
 
     var body: some Scene {
         MenuBarExtra {
             MenuBarView()
                 .environmentObject(monitor)
                 .environmentObject(locationManager)
+                .environmentObject(langManager)
+                .environmentObject(UpdaterWrapper(controller: updaterController))
         } label: {
             MenuBarIconView(status: monitor.status)
         }
@@ -19,6 +40,8 @@ struct WifiManagerApp: App {
             SettingsView()
                 .environmentObject(monitor)
                 .environmentObject(locationManager)
+                .environmentObject(langManager)
+                .environmentObject(UpdaterWrapper(controller: updaterController))
         }
     }
 }
@@ -42,8 +65,8 @@ private struct MenuBarIconView: View {
 
     private var symbolName: String {
         switch status {
-        case .disconnected: return "wifi.slash"
-        case .hotspot, .wifi: return "wifi"
+        case .disconnected:         return "globe.slash"
+        case .hotspot, .wifi:       return "globe"
         }
     }
 }

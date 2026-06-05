@@ -1,11 +1,5 @@
 # TODOS — WifiManager
 
-## En cours
-
-- [ ] Générer le projet Xcode via `xcodegen generate` et vérifier la compilation
-- [ ] Tester sur un Mac avec WiFi actif
-- [ ] Tester la détection hotspot (partage iPhone)
-
 ## À faire — v1.1
 
 - [ ] Test de débit réel (download) via URLSession sur un endpoint dédié
@@ -33,3 +27,7 @@
 - [x] Profils de lieux (CoreLocation + UserDefaults JSON)
 - [x] Fenêtre de préférences (Général / Lieux / À propos)
 - [x] Structure XcodeGen (project.yml)
+- [x] Localisation FR/EN sélectionnable dans les Préférences
+- [x] Auto-update Sparkle 2 (clé EdDSA générée, appcast configurable)
+- [x] README anglais avec badges, roadmap, instructions build
+- [x] Dépôt GitHub public (https://github.com/vincentlauriat/WifiManager)

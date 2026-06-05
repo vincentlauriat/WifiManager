@@ -6,7 +6,11 @@
 
 A lightweight macOS menu bar app that monitors your WiFi connection quality in real time, distinguishes real networks from iPhone hotspots, and scores connection suitability per use case.
 
-> **Screenshot coming soon**
+<p align="center">
+  <img src="Screenshots/popover.png" width="320" alt="WiFi monitor popover"/>
+  &nbsp;&nbsp;
+  <img src="Screenshots/settings.png" width="320" alt="Preferences window"/>
+</p>
 
 ---
 

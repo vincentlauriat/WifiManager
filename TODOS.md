@@ -14,7 +14,7 @@
 - [ ] Global keyboard shortcut to open the popover
 - [ ] Custom app icon (PNG 512×512)
 
-## Done — v1.0
+## Done — v1.0 (released 2026-06-05)
 
 - [x] Color-coded menu bar icon (red / orange / green)
 - [x] Connection status detection via CWWiFiClient + NWPathMonitor

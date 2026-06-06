@@ -10,7 +10,7 @@
             <sparkle:version>2</sparkle:version>
             <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/vincentlauriat/WifiManager/releases/download/v1.1.0/WifiManager-1.1.0.zip" length="1288858" type="application/octet-stream" sparkle:edSignature="NUMV0aU5pjZpIK1Y/sz9slORDDe7P7GBpBz7iF4VY/UQ5oeIY4Ks4ks1Ft34yqY7Om3Q5643ap29Ki85gbXhCw=="/>
+            <enclosure url="https://github.com/vincentlauriat/WifiManager/releases/download/v1.1.0/WifiManager-1.1.0.zip" length="1456288" type="application/octet-stream" sparkle:edSignature="BDGxjWhom+95OYV3M5nkPtKAf+43hmGGqzBvRjpDVIlk6S50CBAUqH2kbQI7uNRbooZOZ94hdYT7RTcs6S9iAw=="/>
         </item>
     </channel>
 </rss>

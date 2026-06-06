@@ -1,4 +1,4 @@
-import CoreWLAN
+@preconcurrency import CoreWLAN
 import Network
 import CoreLocation
 import SwiftUI
@@ -6,6 +6,7 @@ import SwiftUI
 @MainActor
 class WiFiMonitor: NSObject, ObservableObject {
     @Published var status: ConnectionStatus = .disconnected
+    @Published var isWifiEnabled: Bool = true
     @Published var metrics: NetworkMetrics?
     @Published var availableNetworks: [CWNetwork] = []
     @Published var usageScores: [UsageType: NetworkQuality] = [:]
@@ -19,6 +20,8 @@ class WiFiMonitor: NSObject, ObservableObject {
     private let qualityChecker = NetworkQualityChecker()
     private var pathMonitor: NWPathMonitor?
     private var pollTimer: Timer?
+    private var autoReconnectTimer: Timer?
+    private var isRefreshing = false
     // Needed to unlock CWInterface.ssid() on macOS 14+
     private let locationManager = CLLocationManager()
 
@@ -29,26 +32,39 @@ class WiFiMonitor: NSObject, ObservableObject {
             locationManager.requestWhenInUseAuthorization()
         }
         setupPathMonitor()
+        setupWiFiEvents()
         Task { await refresh() }
-        startPolling()
+        schedulePoll()
     }
 
     deinit {
         pathMonitor?.cancel()
         pollTimer?.invalidate()
+        autoReconnectTimer?.invalidate()
     }
 
     // MARK: - Public
 
     func refresh() async {
+        guard !isRefreshing else { return }
+        isRefreshing = true
+        defer { isRefreshing = false }
         connectionError = nil
 
-        // NWPathMonitor est la source de vérité pour la connectivité
-        guard typeDetector.isConnected,
-              let interface = wifiClient.interface(),
-              interface.powerOn() else {
+        guard let interface = wifiClient.interface() else {
+            isWifiEnabled = false
             status = .disconnected
             metrics = nil
+            scheduleAutoReconnectIfNeeded()
+            return
+        }
+
+        isWifiEnabled = interface.powerOn()
+
+        guard isWifiEnabled, typeDetector.isConnected else {
+            status = .disconnected
+            metrics = nil
+            scheduleAutoReconnectIfNeeded()
             return
         }
 
@@ -80,6 +96,7 @@ class WiFiMonitor: NSObject, ObservableObject {
         self.lastUpdated = Date()
         self.usageScores = await qualityChecker.computeUsageScores(metrics: m)
         self.status = isExpensive ? .hotspot(quality: m.quality) : .wifi(quality: m.quality)
+        cancelAutoReconnect()
     }
 
     func reconnect() async {
@@ -98,6 +115,22 @@ class WiFiMonitor: NSObject, ObservableObject {
 
         isReconnecting = false
         await refresh()
+    }
+
+    func togglePower() async {
+        guard let interface = wifiClient.interface() else { return }
+        let enabling = !interface.powerOn()
+        try? interface.setPower(enabling)
+        isWifiEnabled = enabling
+        if !enabling {
+            cancelAutoReconnect()
+            status = .disconnected
+            metrics = nil
+            availableNetworks = []
+        } else {
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            await refresh()
+        }
     }
 
     func scanNetworks() async {
@@ -152,12 +185,50 @@ class WiFiMonitor: NSObject, ObservableObject {
         monitor.start(queue: .global(qos: .utility))
     }
 
-    private func startPolling() {
-        pollTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+    private func setupWiFiEvents() {
+        wifiClient.delegate = self
+        let events: [CWEventType] = [
+            .ssidDidChange, .bssidDidChange, .linkDidChange,
+            .linkQualityDidChange, .powerDidChange
+        ]
+        for event in events {
+            try? wifiClient.startMonitoringEvent(with: event)
+        }
+    }
+
+    private func schedulePoll() {
+        let raw = UserDefaults.standard.double(forKey: "pollInterval")
+        let interval = raw > 0 ? raw : 30
+        pollTimer?.invalidate()
+        pollTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
             Task { @MainActor [weak self] in
                 await self?.refresh()
+                self?.schedulePoll()
             }
         }
+    }
+
+    private func scheduleAutoReconnectIfNeeded() {
+        guard autoReconnectTimer == nil else { return }
+        guard isWifiEnabled else { return }
+        let interval = UserDefaults.standard.double(forKey: "autoReconnectInterval")
+        let effectiveInterval = interval > 0 ? interval : 20
+        guard UserDefaults.standard.object(forKey: "autoReconnectInterval") == nil || interval > 0 else { return }
+        autoReconnectTimer = Timer.scheduledTimer(withTimeInterval: effectiveInterval, repeats: false) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self, self.isWifiEnabled, case .disconnected = self.status else {
+                    self?.autoReconnectTimer = nil
+                    return
+                }
+                self.autoReconnectTimer = nil
+                await self.refresh()
+            }
+        }
+    }
+
+    private func cancelAutoReconnect() {
+        autoReconnectTimer?.invalidate()
+        autoReconnectTimer = nil
     }
 
     private func scanAndConnect(ssid: String, on interface: CWInterface) async {
@@ -182,6 +253,33 @@ class WiFiMonitor: NSObject, ObservableObject {
 // Relaie le SSID dès que la permission localisation est accordée
 extension WiFiMonitor: CLLocationManagerDelegate {
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        Task { @MainActor in await self.refresh() }
+    }
+}
+
+// Réaction instantanée aux événements WiFi (pas de polling)
+extension WiFiMonitor: CWEventDelegate {
+    nonisolated func ssidDidChangeForWiFiInterface(withName interfaceName: String) {
+        Task { @MainActor in await self.refresh() }
+    }
+
+    nonisolated func bssidDidChangeForWiFiInterface(withName interfaceName: String) {
+        Task { @MainActor in await self.refresh() }
+    }
+
+    nonisolated func linkDidChangeForWiFiInterface(withName interfaceName: String) {
+        Task { @MainActor in await self.refresh() }
+    }
+
+    nonisolated func linkQualityDidChangeForWiFiInterface(withName interfaceName: String, rssi: Int, transmitRate: Double) {
+        Task { @MainActor in await self.refresh() }
+    }
+
+    nonisolated func powerStateDidChangeForWiFiInterface(withName interfaceName: String) {
+        Task { @MainActor in await self.refresh() }
+    }
+
+    nonisolated func clientConnectionInterrupted() {
         Task { @MainActor in await self.refresh() }
     }
 }

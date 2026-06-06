@@ -33,10 +33,16 @@ struct StatusHeaderView: View {
                                 .foregroundStyle(.tertiary)
                         }
                     }
-                } else {
+                } else if monitor.isWifiEnabled {
                     Text(lang.s.notConnected)
                         .font(.headline)
                     Text(lang.s.noActiveWifi)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(lang.s.wifiOff)
+                        .font(.headline)
+                    Text(lang.s.wifiOffNote)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -44,17 +50,34 @@ struct StatusHeaderView: View {
 
             Spacer()
 
-            Button {
-                Task { await monitor.refresh() }
-            } label: {
-                Image(systemName: "arrow.clockwise")
-                    .foregroundStyle(.secondary)
+            HStack(spacing: 10) {
+                Toggle("", isOn: Binding(
+                    get: { monitor.isWifiEnabled },
+                    set: { _ in Task { await monitor.togglePower() } }
+                ))
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .controlSize(.small)
+                .help(monitor.isWifiEnabled ? lang.s.disableWifi : lang.s.enableWifi)
+
+                Button {
+                    Task { await monitor.refresh() }
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .help(lang.s.refresh)
+                .disabled(!monitor.isWifiEnabled)
+                .opacity(monitor.isWifiEnabled ? 1 : 0.3)
             }
-            .buttonStyle(.plain)
-            .help(lang.s.refresh)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
+    }
+
+    private var isSearching: Bool {
+        monitor.isWifiEnabled && monitor.status == .disconnected
     }
 
     private var statusBadge: some View {
@@ -65,6 +88,7 @@ struct StatusHeaderView: View {
             Image(systemName: badgeIcon)
                 .font(.system(size: 17))
                 .foregroundStyle(monitor.status.iconColor)
+                .symbolEffect(.pulse, isActive: isSearching)
         }
     }
 

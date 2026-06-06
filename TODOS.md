@@ -5,7 +5,6 @@
 - [ ] Real download speed test via URLSession against a dedicated endpoint
 - [ ] System notifications: alert on connection loss or quality degradation
 - [ ] 24-hour RSSI and latency history chart (SwiftUI Charts)
-- [ ] Launch at login via SMAppService (macOS 13+)
 
 ## Backlog — v1.2
 
@@ -13,6 +12,19 @@
 - [ ] Multi-interface support (multiple WiFi adapters)
 - [ ] Global keyboard shortcut to open the popover
 - [ ] Custom app icon (PNG 512×512)
+
+## Done — v1.1 (unreleased)
+
+- [x] Launch at login via SMAppService (macOS 13+)
+- [x] WiFi global toggle (enable/disable via CWInterface.setPower)
+- [x] Guide to replace the native WiFi system icon (System Settings → Control Center)
+- [x] SSID grouping in the network list (AP count badge)
+- [x] Auto-reconnect when disconnected (configurable interval, disabled when WiFi is off)
+- [x] Searching animation (menu bar icon pulse + symbolEffect badge in popover)
+- [x] Event-driven network detection via CWEventDelegate — instant state updates
+- [x] Poll timer fixed: now a one-shot fallback that respects the Preferences interval
+- [x] Menu bar icon fix: replaced non-existent globe.slash with wifi.slash
+- [x] Menu bar icon: wifi / personalhotspot / wifi.slash instead of globe
 
 ## Done — v1.0 (released 2026-06-05)
 

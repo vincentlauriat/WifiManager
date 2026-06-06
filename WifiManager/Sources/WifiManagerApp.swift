@@ -32,7 +32,10 @@ struct WifiManagerApp: App {
                 .environmentObject(langManager)
                 .environmentObject(UpdaterWrapper(controller: updaterController))
         } label: {
-            MenuBarIconView(status: monitor.status)
+            MenuBarIconView(
+                status: monitor.status,
+                isSearching: monitor.isWifiEnabled && monitor.status == .disconnected
+            )
         }
         .menuBarExtraStyle(.window)
 
@@ -48,25 +51,37 @@ struct WifiManagerApp: App {
 
 private struct MenuBarIconView: View {
     let status: ConnectionStatus
+    let isSearching: Bool
+    @State private var pulsing = false
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             Image(systemName: symbolName)
-                .symbolRenderingMode(.hierarchical)
+                .padding(.trailing, 4)
+                .padding(.bottom, 4)
+                .opacity(pulsing ? 0.3 : 1.0)
+                .animation(
+                    isSearching
+                        ? .easeInOut(duration: 0.8).repeatForever(autoreverses: true)
+                        : .easeInOut(duration: 0.2),
+                    value: pulsing
+                )
 
             // SF Symbols in MenuBarExtra are forced to template (monochrome) by macOS.
             // A SwiftUI shape bypasses that pipeline and preserves its fill color.
             Circle()
                 .fill(dotColor)
-                .frame(width: 6, height: 6)
-                .offset(x: 2, y: 2)
+                .frame(width: 7, height: 7)
         }
+        .onAppear { pulsing = isSearching }
+        .onChange(of: isSearching) { _, newValue in pulsing = newValue }
     }
 
     private var symbolName: String {
         switch status {
-        case .disconnected:     return "globe.slash"
-        case .hotspot, .wifi:   return "globe"
+        case .disconnected:     return "wifi.slash"
+        case .hotspot:          return "personalhotspot"
+        case .wifi:             return "wifi"
         }
     }
 

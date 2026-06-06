@@ -5,12 +5,32 @@ extension CWNetwork: @retroactive Identifiable {
     public var id: String { bssid ?? ssid ?? "unknown-\(hashValue)" }
 }
 
+private struct NetworkGroup: Identifiable {
+    let id: String       // ssid
+    let ssid: String
+    let best: CWNetwork  // highest RSSI
+    let apCount: Int
+}
+
 struct NetworkListView: View {
     @EnvironmentObject var monitor: WiFiMonitor
     @EnvironmentObject var lang: LanguageManager
-    @State private var promptingID: String?
+    @State private var promptingSSID: String?
     @State private var passwordInput = ""
-    @State private var failedID: String?
+    @State private var failedSSID: String?
+
+    private var groupedNetworks: [NetworkGroup] {
+        var dict: [String: [CWNetwork]] = [:]
+        for n in monitor.availableNetworks {
+            let key = n.ssid ?? ""
+            guard !key.isEmpty else { continue }
+            dict[key, default: []].append(n)
+        }
+        return dict.compactMap { ssid, networks -> NetworkGroup? in
+            guard let best = networks.max(by: { $0.rssiValue < $1.rssiValue }) else { return nil }
+            return NetworkGroup(id: ssid, ssid: ssid, best: best, apCount: networks.count)
+        }.sorted { $0.best.rssiValue > $1.best.rssiValue }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,39 +43,41 @@ struct NetworkListView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-            } else if monitor.availableNetworks.isEmpty {
+            } else if groupedNetworks.isEmpty {
                 Text(lang.s.noNetworks)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
             } else {
-                ForEach(monitor.availableNetworks.prefix(8)) { network in
+                let groups = Array(groupedNetworks.prefix(8))
+                ForEach(Array(groups.enumerated()), id: \.element.id) { index, group in
                     NetworkRow(
-                        network: network,
-                        isCurrentNetwork: network.ssid == monitor.metrics?.ssid,
-                        isPrompting: promptingID == network.id,
+                        network: group.best,
+                        apCount: group.apCount,
+                        isCurrentNetwork: group.ssid == monitor.metrics?.ssid,
+                        isPrompting: promptingSSID == group.ssid,
                         passwordInput: $passwordInput
                     ) {
                         Task {
-                            failedID = nil
-                            await monitor.connect(to: network)
+                            failedSSID = nil
+                            await monitor.connect(to: group.best)
                             if monitor.connectionError != nil {
-                                failedID = network.id
-                                promptingID = network.id
+                                failedSSID = group.ssid
+                                promptingSSID = group.ssid
                                 passwordInput = ""
                             }
                         }
                     } onConnect: { pwd in
-                        promptingID = nil
-                        failedID = nil
-                        Task { await monitor.connect(to: network, password: pwd.isEmpty ? nil : pwd) }
+                        promptingSSID = nil
+                        failedSSID = nil
+                        Task { await monitor.connect(to: group.best, password: pwd.isEmpty ? nil : pwd) }
                     } onCancel: {
-                        promptingID = nil
-                        failedID = nil
+                        promptingSSID = nil
+                        failedSSID = nil
                     }
 
-                    if network != monitor.availableNetworks.prefix(8).last {
+                    if index < groups.count - 1 {
                         Divider().padding(.leading, 36)
                     }
                 }
@@ -78,6 +100,7 @@ struct NetworkListView: View {
 
 private struct NetworkRow: View {
     let network: CWNetwork
+    let apCount: Int
     let isCurrentNetwork: Bool
     let isPrompting: Bool
     @Binding var passwordInput: String
@@ -102,6 +125,16 @@ private struct NetworkRow: View {
                         Image(systemName: "checkmark")
                             .foregroundStyle(Color.accentColor)
                             .font(.caption.weight(.semibold))
+                    }
+
+                    if apCount > 1 {
+                        Text("\(apCount)")
+                            .font(.system(size: 9).monospacedDigit())
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.18))
+                            .clipShape(Capsule())
+                            .foregroundStyle(.secondary)
                     }
 
                     Spacer()

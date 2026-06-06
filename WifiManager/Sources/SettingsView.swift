@@ -1,5 +1,6 @@
 import SwiftUI
 import Sparkle
+import ServiceManagement
 
 struct SettingsView: View {
     @EnvironmentObject var lang: LanguageManager
@@ -13,7 +14,7 @@ struct SettingsView: View {
             AboutTab()
                 .tabItem { Label(lang.s.tabAbout, systemImage: "info.circle") }
         }
-        .frame(width: 420, height: 320)
+        .frame(width: 420, height: 480)
     }
 }
 
@@ -21,10 +22,11 @@ struct SettingsView: View {
 
 private struct GeneralTab: View {
     @AppStorage("pollInterval") private var pollInterval: Double = 30
+    @AppStorage("autoReconnectInterval") private var autoReconnectInterval: Double = 20
     @AppStorage("showHotspotBadge") private var showHotspotBadge = true
     @AppStorage("notifyOnDisconnect") private var notifyOnDisconnect = true
     @AppStorage("notifyOnHotspot") private var notifyOnHotspot = true
-    @AppStorage("launchAtLogin") private var launchAtLogin = false
+    @State private var launchAtLoginEnabled = SMAppService.mainApp.status == .enabled
     @EnvironmentObject var lang: LanguageManager
 
     var body: some View {
@@ -38,16 +40,43 @@ private struct GeneralTab: View {
                 }
                 Toggle(lang.s.hotspotBadge, isOn: $showHotspotBadge)
             }
+            Section(lang.s.autoReconnect) {
+                Picker(lang.s.reconnectIntervalLabel, selection: $autoReconnectInterval) {
+                    Text(lang.s.disabled).tag(0.0)
+                    Text("10 s").tag(10.0)
+                    Text("20 s").tag(20.0)
+                    Text("30 s").tag(30.0)
+                    Text("1 min").tag(60.0)
+                }
+            }
             Section(lang.s.notifications) {
                 Toggle(lang.s.notifyDisconnect, isOn: $notifyOnDisconnect)
                 Toggle(lang.s.notifyHotspot, isOn: $notifyOnHotspot)
             }
             Section(lang.s.startup) {
-                Toggle(lang.s.launchAtLogin, isOn: $launchAtLogin)
-                    .disabled(true)
-                Text(lang.s.launchAtLoginNote)
+                Toggle(lang.s.launchAtLogin, isOn: $launchAtLoginEnabled)
+                    .onChange(of: launchAtLoginEnabled) { _, newValue in
+                        do {
+                            if newValue {
+                                try SMAppService.mainApp.register()
+                            } else {
+                                try SMAppService.mainApp.unregister()
+                            }
+                        } catch {
+                            launchAtLoginEnabled = SMAppService.mainApp.status == .enabled
+                        }
+                    }
+            }
+            Section(lang.s.systemIcon) {
+                Text(lang.s.systemIconNote)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Button(lang.s.openControlCenter) {
+                    NSWorkspace.shared.open(
+                        URL(string: "x-apple.systempreferences:com.apple.ControlCenter-Settings.extension")!
+                    )
+                }
+                .buttonStyle(.bordered)
             }
             Section(lang.s.language) {
                 Picker(lang.s.language, selection: $lang.language) {
@@ -188,7 +217,7 @@ private struct AboutTab: View {
 
             Text("WifiManager")
                 .font(.title2.weight(.semibold))
-            Text("Version 1.0.0")
+            Text("Version 1.1.0")
                 .font(.callout)
                 .foregroundStyle(.secondary)
 

@@ -145,10 +145,31 @@ struct Strings {
     var launchAtLogin: String {
         lang == .french ? "Lancer WifiManager au démarrage" : "Launch WifiManager at login"
     }
-    var launchAtLoginNote: String {
+    // MARK: - Auto-reconnect
+
+    var autoReconnect: String { lang == .french ? "Reconnexion automatique" : "Auto-Reconnect" }
+    var reconnectIntervalLabel: String { lang == .french ? "Réessayer toutes les" : "Retry every" }
+    var disabled: String { lang == .french ? "Désactivé" : "Disabled" }
+
+    // MARK: - WiFi power
+
+    var wifiOff: String { lang == .french ? "WiFi désactivé" : "WiFi Off" }
+    var wifiOffNote: String {
+        lang == .french ? "Le WiFi est désactivé sur cet appareil." : "WiFi is disabled on this device."
+    }
+    var enableWifi: String { lang == .french ? "Activer le WiFi" : "Enable WiFi" }
+    var disableWifi: String { lang == .french ? "Désactiver le WiFi" : "Disable WiFi" }
+
+    // MARK: - System icon
+
+    var systemIcon: String { lang == .french ? "Icône système" : "System Icon" }
+    var systemIconNote: String {
         lang == .french
-            ? "Fonctionnalité disponible dans une prochaine version."
-            : "Feature available in a future version."
+            ? "Pour remplacer l'icône WiFi native de macOS, masquez-la dans Réglages Système > Centre de contrôle > WiFi."
+            : "To replace the native macOS WiFi icon, hide it in System Settings > Control Center > WiFi."
+    }
+    var openControlCenter: String {
+        lang == .french ? "Ouvrir Centre de contrôle…" : "Open Control Center Settings…"
     }
 
     // MARK: - Locations tab

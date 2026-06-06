@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>WifiManager</title>
+        <item>
+            <title>1.1.0</title>
+            <pubDate>Sat, 06 Jun 2026 10:05:13 +0200</pubDate>
+            <link>https://github.com/vincentlauriat/WifiManager</link>
+            <sparkle:fullReleaseNotesLink>https://github.com/vincentlauriat/WifiManager/releases/tag/v1.1.0</sparkle:fullReleaseNotesLink>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/vincentlauriat/WifiManager/releases/download/v1.1.0/WifiManager-1.1.0.zip" length="1288858" type="application/octet-stream" sparkle:edSignature="NUMV0aU5pjZpIK1Y/sz9slORDDe7P7GBpBz7iF4VY/UQ5oeIY4Ks4ks1Ft34yqY7Om3Q5643ap29Ki85gbXhCw=="/>
+        </item>
+    </channel>
+</rss>

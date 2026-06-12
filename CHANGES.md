@@ -23,6 +23,7 @@
 - Network path is now observed by a single `NWPathMonitor` (in `ConnectionTypeDetector`), which triggers `refresh()` only after `currentPath` is updated — removes the dual-monitor race that could flicker the hotspot badge
 
 ### Fixed
+- **"Available Networks" showed nothing without Location access**: macOS returns scanned APs with a `nil` SSID until Location is granted, and the `ssid != nil` filter dropped them all into a misleading "No networks found". The list now detects missing authorization (`WiFiMonitor.isLocationAuthorized`) and shows an actionable banner linking to System Settings → Location instead
 - **Locations feature was cosmetic**: the add form never captured coordinates (so `matches` always returned false) and a match never switched networks — both gaps closed
 - Localization: notification titles/bodies and connection-error messages now go through `Strings` (were hardcoded EN / FR respectively, ignoring the language setting)
 - `LocationProfileManager` no longer sends `CLLocationManager` across actor boundaries (reads the status synchronously); `startMonitoring` checks `.authorizedAlways` (the only granted status on macOS)

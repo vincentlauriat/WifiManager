@@ -15,6 +15,8 @@ class WiFiMonitor: NSObject, ObservableObject {
     @Published var isReconnecting = false
     @Published var lastUpdated: Date?
     @Published var connectionError: String?
+    /// macOS hides WiFi SSIDs (scan + current network) until Location is granted.
+    @Published var isLocationAuthorized = false
 
     private let wifiClient = CWWiFiClient.shared()
     private let typeDetector = ConnectionTypeDetector()
@@ -38,6 +40,7 @@ class WiFiMonitor: NSObject, ObservableObject {
             "autoSwitchByLocation": false,
         ])
         locationManager.delegate = self
+        isLocationAuthorized = locationManager.authorizationStatus == .authorizedAlways
         if locationManager.authorizationStatus == .notDetermined {
             locationManager.requestWhenInUseAuthorization()
         }
@@ -325,7 +328,11 @@ class WiFiMonitor: NSObject, ObservableObject {
 // Relaie le SSID dès que la permission localisation est accordée
 extension WiFiMonitor: CLLocationManagerDelegate {
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        Task { @MainActor in await self.refresh() }
+        let authorized = manager.authorizationStatus == .authorizedAlways
+        Task { @MainActor in
+            self.isLocationAuthorized = authorized
+            await self.refresh()
+        }
     }
 }
 

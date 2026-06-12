@@ -43,6 +43,8 @@ struct NetworkListView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
+            } else if !monitor.isLocationAuthorized {
+                locationNeededBanner
             } else if groupedNetworks.isEmpty {
                 Text(lang.s.noNetworks)
                     .font(.caption)
@@ -95,6 +97,30 @@ struct NetworkListView: View {
                 .padding(.vertical, 6)
             }
         }
+    }
+}
+
+extension NetworkListView {
+    fileprivate var locationNeededBanner: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "location.slash.fill")
+                .font(.title3)
+                .foregroundStyle(.orange)
+            Text(lang.s.locationNeededForScan)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Button(lang.s.openSystemSettings) {
+                NSWorkspace.shared.open(
+                    URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")!
+                )
+            }
+            .controlSize(.small)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
     }
 }
 

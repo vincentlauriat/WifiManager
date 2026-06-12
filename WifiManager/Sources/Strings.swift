@@ -88,6 +88,11 @@ struct Strings {
     var noNetworks: String {
         lang == .french ? "Aucun réseau trouvé" : "No networks found"
     }
+    var locationNeededForScan: String {
+        lang == .french
+            ? "macOS masque les noms de réseaux sans accès à la localisation. Autorisez-le pour voir et rejoindre les réseaux."
+            : "macOS hides network names without location access. Allow it to see and join networks."
+    }
     var join: String {
         lang == .french ? "Rejoindre" : "Join"
     }

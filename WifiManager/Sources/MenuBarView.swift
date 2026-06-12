@@ -46,7 +46,7 @@ struct MenuBarView: View {
             ) {
                 Task { await monitor.reconnect() }
             }
-            .disabled(monitor.isReconnecting || monitor.metrics == nil)
+            .disabled(monitor.isReconnecting || !monitor.isWifiEnabled)
 
             Divider().padding(.leading, 36)
 

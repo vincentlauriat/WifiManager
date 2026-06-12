@@ -25,11 +25,10 @@ actor NetworkQualityChecker {
         lastTestDate = nil
     }
 
-    func computeUsageScores(metrics: NetworkMetrics) async -> [UsageType: NetworkQuality] {
-        let latency = metrics.latency
+    nonisolated func computeUsageScores(metrics: NetworkMetrics) -> [UsageType: NetworkQuality] {
         var scores: [UsageType: NetworkQuality] = [:]
         for usage in UsageType.allCases {
-            scores[usage] = usage.quality(latency: latency, download: nil)
+            scores[usage] = usage.quality(latency: metrics.latency, download: nil)
         }
         return scores
     }

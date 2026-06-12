@@ -113,8 +113,7 @@ private struct NetworkRow: View {
         VStack(spacing: 0) {
             Button(action: onTap) {
                 HStack(spacing: 8) {
-                    Image(systemName: signalIcon)
-                        .foregroundStyle(isCurrentNetwork ? Color.accentColor : .secondary)
+                    wifiSignalImage
                         .frame(width: 20)
 
                     Text(network.ssid ?? lang.s.unknownNetwork)
@@ -177,12 +176,15 @@ private struct NetworkRow: View {
         }
     }
 
-    private var signalIcon: String {
-        switch network.rssiValue {
-        case (-50)...:      return "wifi"
-        case (-65)...(-51): return "wifi"
-        case (-75)...(-66): return "wifi"
-        default:            return "wifi.slash"
+    @ViewBuilder
+    private var wifiSignalImage: some View {
+        if network.rssiValue < -75 {
+            Image(systemName: "wifi.slash")
+                .foregroundStyle(.secondary.opacity(0.6))
+        } else {
+            let strength = Double(max(-75, min(-30, network.rssiValue)) + 75) / 45.0
+            Image(systemName: "wifi", variableValue: strength)
+                .foregroundStyle(isCurrentNetwork ? Color.accentColor : .secondary)
         }
     }
 

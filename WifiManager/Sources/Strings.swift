@@ -201,6 +201,30 @@ struct Strings {
         lang == .french ? "Réseau : " : "Network: "
     }
 
+    // MARK: - Notifications (system)
+
+    var notifDisconnectTitle: String {
+        lang == .french ? "WiFi déconnecté" : "WiFi disconnected"
+    }
+    var notifDisconnectBody: String {
+        lang == .french ? "La connexion réseau a été perdue." : "The network connection was lost."
+    }
+    var notifHotspotTitle: String {
+        lang == .french ? "Partage de connexion actif" : "Personal Hotspot active"
+    }
+    var notifHotspotBody: String {
+        lang == .french ? "Connecté via le partage d'un iPhone ou Android." : "Connected via iPhone or Android tethering."
+    }
+
+    // MARK: - Errors
+
+    var scanFailed: String {
+        lang == .french ? "Impossible de scanner les réseaux." : "Unable to scan networks."
+    }
+    var connectFailedCheckPassword: String {
+        lang == .french ? "Connexion échouée. Vérifiez le mot de passe." : "Connection failed. Check the password."
+    }
+
     // MARK: - About
 
     var appDescription: String {

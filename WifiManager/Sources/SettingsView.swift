@@ -217,7 +217,7 @@ private struct AboutTab: View {
 
             Text("WifiManager")
                 .font(.title2.weight(.semibold))
-            Text("Version 1.1.0")
+            Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")")
                 .font(.callout)
                 .foregroundStyle(.secondary)
 

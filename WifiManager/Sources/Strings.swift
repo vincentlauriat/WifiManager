@@ -93,6 +93,9 @@ struct Strings {
             ? "macOS masque les noms de réseaux sans accès à la localisation. Autorisez-le pour voir et rejoindre les réseaux."
             : "macOS hides network names without location access. Allow it to see and join networks."
     }
+    var allowLocation: String {
+        lang == .french ? "Autoriser la localisation" : "Allow location access"
+    }
     var join: String {
         lang == .french ? "Rejoindre" : "Join"
     }

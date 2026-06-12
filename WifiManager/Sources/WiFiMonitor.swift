@@ -17,6 +17,10 @@ class WiFiMonitor: NSObject, ObservableObject {
     @Published var connectionError: String?
     /// macOS hides WiFi SSIDs (scan + current network) until Location is granted.
     @Published var isLocationAuthorized = false
+    /// True only while status is `.notDetermined` — the only state where the
+    /// native permission popup can still be shown (macOS forbids re-prompting
+    /// after a denial; Settings is then the only path).
+    @Published var canRequestLocation = false
 
     private let wifiClient = CWWiFiClient.shared()
     private let typeDetector = ConnectionTypeDetector()
@@ -41,6 +45,7 @@ class WiFiMonitor: NSObject, ObservableObject {
         ])
         locationManager.delegate = self
         isLocationAuthorized = locationManager.authorizationStatus == .authorizedAlways
+        canRequestLocation = locationManager.authorizationStatus == .notDetermined
         if locationManager.authorizationStatus == .notDetermined {
             locationManager.requestWhenInUseAuthorization()
         }
@@ -165,6 +170,12 @@ class WiFiMonitor: NSObject, ObservableObject {
 
         isReconnecting = false
         await refresh()
+    }
+
+    /// Shows the native Location permission popup. No-op (no popup) once the user
+    /// has answered once — macOS only prompts while status is `.notDetermined`.
+    func requestLocationPermission() {
+        locationManager.requestWhenInUseAuthorization()
     }
 
     /// Connects to a network by SSID name (used by location-based auto-switch).
@@ -328,9 +339,10 @@ class WiFiMonitor: NSObject, ObservableObject {
 // Relaie le SSID dès que la permission localisation est accordée
 extension WiFiMonitor: CLLocationManagerDelegate {
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        let authorized = manager.authorizationStatus == .authorizedAlways
+        let status = manager.authorizationStatus
         Task { @MainActor in
-            self.isLocationAuthorized = authorized
+            self.isLocationAuthorized = status == .authorizedAlways
+            self.canRequestLocation = status == .notDetermined
             await self.refresh()
         }
     }

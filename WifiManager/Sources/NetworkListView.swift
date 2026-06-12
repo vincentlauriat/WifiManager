@@ -111,12 +111,22 @@ extension NetworkListView {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            Button(lang.s.openSystemSettings) {
-                NSWorkspace.shared.open(
-                    URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")!
-                )
+            if monitor.canRequestLocation {
+                // Status is still .notDetermined → the native popup can appear.
+                Button(lang.s.allowLocation) {
+                    monitor.requestLocationPermission()
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+            } else {
+                // Already denied — macOS won't re-prompt, Settings is the only path.
+                Button(lang.s.openSystemSettings) {
+                    NSWorkspace.shared.open(
+                        URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices")!
+                    )
+                }
+                .controlSize(.small)
             }
-            .controlSize(.small)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 16)

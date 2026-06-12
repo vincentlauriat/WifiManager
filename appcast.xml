@@ -6,16 +6,16 @@
     <description>WifiManager release feed</description>
     <language>en</language>
     <item>
-      <title>v1.1.0</title>
-      <pubDate>Fri, 12 Jun 2026 14:36:02 +0200</pubDate>
-      <sparkle:version>2</sparkle:version>
-      <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
+      <title>v1.2.0</title>
+      <pubDate>Sat, 13 Jun 2026 00:11:36 +0200</pubDate>
+      <sparkle:version>3</sparkle:version>
+      <sparkle:shortVersionString>1.2.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-      <sparkle:releaseNotesLink>https://github.com/vincentlauriat/WifiManager/releases/tag/v1.1.0</sparkle:releaseNotesLink>
+      <sparkle:releaseNotesLink>https://github.com/vincentlauriat/WifiManager/releases/tag/v1.2.0</sparkle:releaseNotesLink>
       <enclosure
-        url="https://github.com/vincentlauriat/WifiManager/releases/download/v1.1.0/WifiManager-1.1.0.dmg"
+        url="https://github.com/vincentlauriat/WifiManager/releases/download/v1.2.0/WifiManager-1.2.0.dmg"
         type="application/octet-stream"
-        sparkle:edSignature="Kmap1T5PbAOL5ShicUAi8dawBeTUhB5tJJUKU9oga6QNC9Wln4/kCjSrSS9UBiOdANcHKi4WpJamP9iwyWbwCg==" length="1437019" />
+        sparkle:edSignature="YObogBu47yqe2guVihcEBqt+SNIBKt/3yRnzlDRnaDJpjXj4UWZzyOePPOsBNoRu/wKRw9rq1ePfxEJEqkl2AQ==" length="1781167" />
     </item>
   </channel>
 </rss>

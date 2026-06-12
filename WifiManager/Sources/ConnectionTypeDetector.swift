@@ -1,12 +1,19 @@
 import Network
 
+@MainActor
 final class ConnectionTypeDetector {
     private let monitor = NWPathMonitor()
     private(set) var currentPath: NWPath?
+    /// Fired on the main actor *after* `currentPath` is updated, so observers
+    /// always read a fresh path (no cross-monitor race).
+    var onPathUpdate: (() -> Void)?
 
     init() {
         monitor.pathUpdateHandler = { [weak self] path in
-            self?.currentPath = path
+            Task { @MainActor [weak self] in
+                self?.currentPath = path
+                self?.onPathUpdate?()
+            }
         }
         monitor.start(queue: .global(qos: .utility))
     }

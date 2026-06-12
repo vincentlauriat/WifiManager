@@ -3,6 +3,7 @@ import SwiftUI
 struct StatusHeaderView: View {
     @EnvironmentObject var monitor: WiFiMonitor
     @EnvironmentObject var lang: LanguageManager
+    @AppStorage("showHotspotBadge") private var showHotspotBadge = true
 
     var body: some View {
         HStack(spacing: 10) {
@@ -13,7 +14,7 @@ struct StatusHeaderView: View {
                     Text(m.ssid)
                         .font(.headline)
                     HStack(spacing: 4) {
-                        if m.isExpensive {
+                        if m.isExpensive && showHotspotBadge {
                             Label(lang.s.hotspot, systemImage: "personalhotspot")
                                 .font(.caption)
                                 .foregroundStyle(.orange)
@@ -28,9 +29,11 @@ struct StatusHeaderView: View {
                                 .foregroundStyle(.secondary)
                         }
                         if let updated = monitor.lastUpdated {
-                            Text("· \(updatedLabel(updated))")
-                                .font(.caption)
-                                .foregroundStyle(.tertiary)
+                            TimelineView(.periodic(from: .now, by: 10)) { _ in
+                                Text("· \(updatedLabel(updated))")
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
                         }
                     }
                 } else if monitor.isWifiEnabled {

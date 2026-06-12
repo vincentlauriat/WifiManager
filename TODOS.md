@@ -3,11 +3,18 @@
 ## Backlog — v1.2+
 
 - [ ] Real download speed test via URLSession against a dedicated endpoint
-- [ ] System notifications: alert on connection loss or quality degradation
 - [ ] 24-hour RSSI and latency history chart (SwiftUI Charts)
 - [ ] CSV export of metrics (RSSI, latency, speed) for a chosen time range
 - [ ] Multi-interface support (multiple WiFi adapters)
 - [ ] Global keyboard shortcut to open the popover
+
+## In progress — v1.2
+
+- [x] System notifications: alert on connection loss and on hotspot switch (localized, opt-in toggles)
+- [x] Localize notification + connection-error strings via `Strings`
+- [x] Request notification permission once at launch (was per-alert)
+- [x] Consolidate to a single `NWPathMonitor` (removes dual-monitor path race)
+- [x] Dynamic version string in About tab
 
 ## Done — v1.1 (released 2026-06-12)
 

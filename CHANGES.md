@@ -3,8 +3,21 @@
 ## [Unreleased]
 
 ### Added
+- System notifications on connection loss and on switching to a personal hotspot (toggles in Preferences → Notifications)
+- "Show hotspot badge" toggle in Preferences → Monitoring
+- Variable-strength WiFi signal glyph in the network list (`wifi` with `variableValue`), `wifi.slash` below −75 dBm
+- "Last updated" label now refreshes live via `TimelineView`
 - `Scripts/release.sh` : pipeline de release complet (build Release → codesign Developer ID + Hardened Runtime → notarisation Apple → staple → DMG avec layout Finder → signature EdDSA Sparkle → `appcast.xml`)
 - `Scripts/make-dmg-background.swift` : génère le fond DMG (flèche app → Applications, fenêtre 540×380)
+
+### Changed
+- About tab reads the version dynamically from the bundle instead of a hardcoded string
+- `computeUsageScores` is now `nonisolated` (removes an actor hop on every refresh)
+- Notification permission is requested once at launch instead of at each alert (no more dialog appearing at a random moment)
+- Network path is now observed by a single `NWPathMonitor` (in `ConnectionTypeDetector`), which triggers `refresh()` only after `currentPath` is updated — removes the dual-monitor race that could flicker the hotspot badge
+
+### Fixed
+- Localization: notification titles/bodies and connection-error messages now go through `Strings` (were hardcoded EN / FR respectively, ignoring the language setting)
 
 ## [1.1.0] — 2026-06-06
 

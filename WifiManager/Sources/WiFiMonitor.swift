@@ -2,6 +2,7 @@
 import Network
 import CoreLocation
 import SwiftUI
+import UserNotifications
 
 @MainActor
 class WiFiMonitor: NSObject, ObservableObject {
@@ -18,29 +19,52 @@ class WiFiMonitor: NSObject, ObservableObject {
     private let wifiClient = CWWiFiClient.shared()
     private let typeDetector = ConnectionTypeDetector()
     private let qualityChecker = NetworkQualityChecker()
-    private var pathMonitor: NWPathMonitor?
     private var pollTimer: Timer?
     private var autoReconnectTimer: Timer?
     private var isRefreshing = false
+    private var hasCompletedFirstRefresh = false
     // Needed to unlock CWInterface.ssid() on macOS 14+
     private let locationManager = CLLocationManager()
 
     override init() {
         super.init()
+        UserDefaults.standard.register(defaults: [
+            "pollInterval": 30.0,
+            "autoReconnectInterval": 20.0,
+            "notifyOnDisconnect": true,
+            "notifyOnHotspot": true,
+            "showHotspotBadge": true,
+        ])
         locationManager.delegate = self
         if locationManager.authorizationStatus == .notDetermined {
             locationManager.requestWhenInUseAuthorization()
         }
-        setupPathMonitor()
+        // Single source of truth for network path: refresh once the path is fresh.
+        typeDetector.onPathUpdate = { [weak self] in
+            Task { @MainActor [weak self] in
+                await self?.qualityChecker.invalidateCache()
+                await self?.refresh()
+            }
+        }
+        // Ask for notification permission once, up front, instead of at the first alert.
+        Task { _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) }
         setupWiFiEvents()
         Task { await refresh() }
         schedulePoll()
     }
 
     deinit {
-        pathMonitor?.cancel()
         pollTimer?.invalidate()
         autoReconnectTimer?.invalidate()
+    }
+
+    // MARK: - Localization
+
+    /// Builds localized strings from the same source of truth as the UI
+    /// (`appLanguage` in UserDefaults), without coupling to LanguageManager.
+    private var strings: Strings {
+        let raw = UserDefaults.standard.string(forKey: "appLanguage") ?? ""
+        return Strings(lang: AppLanguage(rawValue: raw) ?? .french)
     }
 
     // MARK: - Public
@@ -48,14 +72,17 @@ class WiFiMonitor: NSObject, ObservableObject {
     func refresh() async {
         guard !isRefreshing else { return }
         isRefreshing = true
-        defer { isRefreshing = false }
+        let previousStatus = status
+        defer {
+            isRefreshing = false
+            notifyIfNeeded(previousStatus: previousStatus)
+        }
         connectionError = nil
 
         guard let interface = wifiClient.interface() else {
             isWifiEnabled = false
             status = .disconnected
             metrics = nil
-            scheduleAutoReconnectIfNeeded()
             return
         }
 
@@ -68,11 +95,12 @@ class WiFiMonitor: NSObject, ObservableObject {
             return
         }
 
-        let rssi = interface.rssiValue()
         // RSSI 0 = interface active mais non associée à un AP
+        let rssi = interface.rssiValue()
         guard rssi != 0 else {
             status = .disconnected
             metrics = nil
+            scheduleAutoReconnectIfNeeded()
             return
         }
 
@@ -94,7 +122,7 @@ class WiFiMonitor: NSObject, ObservableObject {
 
         self.metrics = m
         self.lastUpdated = Date()
-        self.usageScores = await qualityChecker.computeUsageScores(metrics: m)
+        self.usageScores = qualityChecker.computeUsageScores(metrics: m)
         self.status = isExpensive ? .hotspot(quality: m.quality) : .wifi(quality: m.quality)
         cancelAutoReconnect()
     }
@@ -138,11 +166,12 @@ class WiFiMonitor: NSObject, ObservableObject {
         isScanning = true
         defer { isScanning = false }
 
+        nonisolated(unsafe) let iface = interface
         do {
             let networks: Set<CWNetwork> = try await withCheckedThrowingContinuation { cont in
                 DispatchQueue.global(qos: .userInitiated).async {
                     do {
-                        let result = try interface.scanForNetworks(withName: nil, includeHidden: false)
+                        let result = try iface.scanForNetworks(withName: nil, includeHidden: false)
                         cont.resume(returning: result)
                     } catch {
                         cont.resume(throwing: error)
@@ -153,7 +182,7 @@ class WiFiMonitor: NSObject, ObservableObject {
                 .filter { $0.ssid != nil }
                 .sorted { $0.rssiValue > $1.rssiValue }
         } catch {
-            connectionError = "Impossible de scanner les réseaux."
+            connectionError = strings.scanFailed
         }
     }
 
@@ -167,23 +196,11 @@ class WiFiMonitor: NSObject, ObservableObject {
             await qualityChecker.invalidateCache()
             await refresh()
         } catch {
-            connectionError = "Connexion échouée. Vérifiez le mot de passe."
+            connectionError = strings.connectFailedCheckPassword
         }
     }
 
     // MARK: - Private
-
-    private func setupPathMonitor() {
-        let monitor = NWPathMonitor()
-        pathMonitor = monitor
-        monitor.pathUpdateHandler = { [weak self] _ in
-            Task { @MainActor [weak self] in
-                await self?.qualityChecker.invalidateCache()
-                await self?.refresh()
-            }
-        }
-        monitor.start(queue: .global(qos: .utility))
-    }
 
     private func setupWiFiEvents() {
         wifiClient.delegate = self
@@ -197,8 +214,7 @@ class WiFiMonitor: NSObject, ObservableObject {
     }
 
     private func schedulePoll() {
-        let raw = UserDefaults.standard.double(forKey: "pollInterval")
-        let interval = raw > 0 ? raw : 30
+        let interval = UserDefaults.standard.double(forKey: "pollInterval")
         pollTimer?.invalidate()
         pollTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
             Task { @MainActor [weak self] in
@@ -212,9 +228,8 @@ class WiFiMonitor: NSObject, ObservableObject {
         guard autoReconnectTimer == nil else { return }
         guard isWifiEnabled else { return }
         let interval = UserDefaults.standard.double(forKey: "autoReconnectInterval")
-        let effectiveInterval = interval > 0 ? interval : 20
-        guard UserDefaults.standard.object(forKey: "autoReconnectInterval") == nil || interval > 0 else { return }
-        autoReconnectTimer = Timer.scheduledTimer(withTimeInterval: effectiveInterval, repeats: false) { [weak self] _ in
+        guard interval > 0 else { return }
+        autoReconnectTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self, self.isWifiEnabled, case .disconnected = self.status else {
                     self?.autoReconnectTimer = nil
@@ -232,11 +247,12 @@ class WiFiMonitor: NSObject, ObservableObject {
     }
 
     private func scanAndConnect(ssid: String, on interface: CWInterface) async {
+        nonisolated(unsafe) let iface = interface
         do {
             let networks: Set<CWNetwork> = try await withCheckedThrowingContinuation { cont in
                 DispatchQueue.global(qos: .userInitiated).async {
                     do {
-                        let result = try interface.scanForNetworks(withName: ssid, includeHidden: false)
+                        let result = try iface.scanForNetworks(withName: ssid, includeHidden: false)
                         cont.resume(returning: result)
                     } catch {
                         cont.resume(throwing: error)
@@ -244,9 +260,37 @@ class WiFiMonitor: NSObject, ObservableObject {
                 }
             }
             if let network = networks.first {
-                try? interface.associate(to: network, password: nil)
+                try? iface.associate(to: network, password: nil)
             }
         } catch {}
+    }
+
+    // MARK: - Notifications
+
+    private func notifyIfNeeded(previousStatus: ConnectionStatus) {
+        guard hasCompletedFirstRefresh else {
+            hasCompletedFirstRefresh = true
+            return
+        }
+        let s = strings
+        if case .disconnected = status, previousStatus != .disconnected,
+           UserDefaults.standard.bool(forKey: "notifyOnDisconnect") {
+            sendNotification(title: s.notifDisconnectTitle, body: s.notifDisconnectBody)
+        }
+        if case .hotspot = status, !previousStatus.isHotspot,
+           UserDefaults.standard.bool(forKey: "notifyOnHotspot") {
+            sendNotification(title: s.notifHotspotTitle, body: s.notifHotspotBody)
+        }
+    }
+
+    private func sendNotification(title: String, body: String) {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+        // Authorization is requested once at init; if denied, add() is simply a no-op.
+        Task { try? await UNUserNotificationCenter.current().add(request) }
     }
 }
 

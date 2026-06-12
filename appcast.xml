@@ -1,16 +1,21 @@
-<?xml version="1.0" standalone="yes"?>
-<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
-    <channel>
-        <title>WifiManager</title>
-        <item>
-            <title>1.1.0</title>
-            <pubDate>Sat, 06 Jun 2026 10:05:13 +0200</pubDate>
-            <link>https://github.com/vincentlauriat/WifiManager</link>
-            <sparkle:fullReleaseNotesLink>https://github.com/vincentlauriat/WifiManager/releases/tag/v1.1.0</sparkle:fullReleaseNotesLink>
-            <sparkle:version>2</sparkle:version>
-            <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/vincentlauriat/WifiManager/releases/download/v1.1.0/WifiManager-1.1.0.zip" length="1456288" type="application/octet-stream" sparkle:edSignature="BDGxjWhom+95OYV3M5nkPtKAf+43hmGGqzBvRjpDVIlk6S50CBAUqH2kbQI7uNRbooZOZ94hdYT7RTcs6S9iAw=="/>
-        </item>
-    </channel>
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>WifiManager</title>
+    <link>https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/appcast.xml</link>
+    <description>WifiManager release feed</description>
+    <language>en</language>
+    <item>
+      <title>v1.1.0</title>
+      <pubDate>Fri, 12 Jun 2026 14:36:02 +0200</pubDate>
+      <sparkle:version>2</sparkle:version>
+      <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <sparkle:releaseNotesLink>https://github.com/vincentlauriat/WifiManager/releases/tag/v1.1.0</sparkle:releaseNotesLink>
+      <enclosure
+        url="https://github.com/vincentlauriat/WifiManager/releases/download/v1.1.0/WifiManager-1.1.0.dmg"
+        type="application/octet-stream"
+        sparkle:edSignature="Kmap1T5PbAOL5ShicUAi8dawBeTUhB5tJJUKU9oga6QNC9Wln4/kCjSrSS9UBiOdANcHKi4WpJamP9iwyWbwCg==" length="1437019" />
+    </item>
+  </channel>
 </rss>

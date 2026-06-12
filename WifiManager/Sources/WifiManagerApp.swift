@@ -1,6 +1,7 @@
 import SwiftUI
 import Sparkle
 
+@MainActor
 final class UpdaterWrapper: ObservableObject {
     let updater: SPUUpdater
 
@@ -31,6 +32,15 @@ struct WifiManagerApp: App {
                 .environmentObject(locationManager)
                 .environmentObject(langManager)
                 .environmentObject(UpdaterWrapper(controller: updaterController))
+                .task {
+                    // Location → network auto-switch (opt-in). Wired here because it's
+                    // the one place both objects are in scope; LocationProfileManager
+                    // and WiFiMonitor stay decoupled.
+                    locationManager.onProfileEnter = { [weak monitor] profile in
+                        guard UserDefaults.standard.bool(forKey: "autoSwitchByLocation") else { return }
+                        Task { await monitor?.connect(toSSID: profile.preferredSSID) }
+                    }
+                }
         } label: {
             MenuBarIconView(
                 status: monitor.status,

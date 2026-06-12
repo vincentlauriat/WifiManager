@@ -112,6 +112,7 @@ struct Strings {
     var signal: String { lang == .french ? "Signal" : "Signal" }
     var latency: String { lang == .french ? "Latence" : "Latency" }
     var linkSpeed: String { lang == .french ? "Débit lien" : "Link Speed" }
+    var downloadSpeed: String { lang == .french ? "Débit réel" : "Download" }
     var snr: String { "SNR" }
 
     // MARK: - Settings
@@ -141,6 +142,17 @@ struct Strings {
     }
     var notifyHotspot: String {
         lang == .french ? "Alerter si l'on passe sur un partage de connexion" : "Alert when switching to hotspot"
+    }
+    var enableSpeedTest: String {
+        lang == .french ? "Mesurer le débit réel (télécharge ~2 Mo)" : "Measure real download speed (~2 MB)"
+    }
+    var enableSpeedTestNote: String {
+        lang == .french
+            ? "Désactivé sur les partages de connexion pour préserver vos données."
+            : "Disabled on hotspots to preserve your data."
+    }
+    var autoSwitchByLocation: String {
+        lang == .french ? "Basculer automatiquement selon le lieu" : "Auto-switch network by location"
     }
     var launchAtLogin: String {
         lang == .french ? "Lancer WifiManager au démarrage" : "Launch WifiManager at login"
@@ -190,6 +202,15 @@ struct Strings {
     }
     var networkSSID: String { "SSID WiFi" }
     var add: String { lang == .french ? "Ajouter" : "Add" }
+    var useCurrentLocation: String {
+        lang == .french ? "Associer ma position actuelle" : "Use my current location"
+    }
+    var locationCaptured: String {
+        lang == .french ? "Position enregistrée" : "Location captured"
+    }
+    var locationUnavailable: String {
+        lang == .french ? "Position indisponible (autorisez la localisation)" : "Location unavailable (allow location access)"
+    }
 
     func locationsCountLabel(_ count: Int) -> String {
         lang == .french

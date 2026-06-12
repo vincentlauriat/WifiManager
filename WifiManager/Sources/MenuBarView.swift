@@ -88,6 +88,7 @@ struct MenuBarView: View {
             }
             .buttonStyle(.plain)
             .help(lang.s.preferencesHelp)
+            .accessibilityLabel(lang.s.preferencesHelp)
 
             Button {
                 NSApp.terminate(nil)
@@ -97,6 +98,7 @@ struct MenuBarView: View {
             }
             .buttonStyle(.plain)
             .help(lang.s.quit)
+            .accessibilityLabel(lang.s.quit)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 7)

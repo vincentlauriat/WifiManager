@@ -62,6 +62,7 @@ struct StatusHeaderView: View {
                 .toggleStyle(.switch)
                 .controlSize(.small)
                 .help(monitor.isWifiEnabled ? lang.s.disableWifi : lang.s.enableWifi)
+                .accessibilityLabel(monitor.isWifiEnabled ? lang.s.disableWifi : lang.s.enableWifi)
 
                 Button {
                     Task { await monitor.refresh() }
@@ -71,6 +72,7 @@ struct StatusHeaderView: View {
                 }
                 .buttonStyle(.plain)
                 .help(lang.s.refresh)
+                .accessibilityLabel(lang.s.refresh)
                 .disabled(!monitor.isWifiEnabled)
                 .opacity(monitor.isWifiEnabled ? 1 : 0.3)
             }

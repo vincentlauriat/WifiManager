@@ -54,7 +54,8 @@
 | Persistence | UserDefaults (JSON) | Serialized location profiles |
 | Preferences | @AppStorage | Simple settings |
 | Auto-update | Sparkle 2 | EdDSA-signed appcast |
-| Concurrency | async/await + @MainActor | Swift Concurrency, thread safety |
+| Concurrency | async/await + @MainActor, `SWIFT_STRICT_CONCURRENCY: targeted` | Swift Concurrency, thread safety |
+| Tests | XCTest (`WifiManagerTests` target) | Pure-logic unit tests |
 
 ## Swift Modules
 
@@ -73,11 +74,14 @@ WifiManager/Sources/
 │                                   refresh(), reconnect(), togglePower()
 │                                   scanNetworks(), connect(to:password:)
 │                                   auto-reconnect timer (configurable interval)
-├── NetworkQualityChecker.swift   — actor: HEAD latency test to apple.com, 30 s cache
+├── NetworkQualityChecker.swift   — actor: HEAD latency test (apple.com, 30 s cache) +
+│                                   sized download test (Cloudflare, 180 s cache, skipped on metered)
 │                                   computeUsageScores() → [UsageType: NetworkQuality]
-├── ConnectionTypeDetector.swift  — Isolated NWPathMonitor, exposes isExpensive / isConnected
+├── ConnectionTypeDetector.swift  — The single NWPathMonitor; exposes isExpensive / isConnected
+│                                   and `onPathUpdate` (fires after currentPath is fresh)
 ├── LocationProfileManager.swift  — @MainActor ObservableObject, CLLocationManagerDelegate
-│                                   CRUD profiles (UserDefaults JSON)
+│                                   CRUD profiles (UserDefaults JSON), lastKnownLocation,
+│                                   onProfileEnter callback (location → auto-switch)
 │
 ├── MenuBarView.swift             — Main popover layout (310 pt)
 ├── StatusHeaderView.swift        — Badge + SSID + WiFi toggle + pulse animation when searching
@@ -85,13 +89,19 @@ WifiManager/Sources/
 ├── UsageScoresView.swift         — 3×2 grid of color-coded usage icons
 ├── NetworkListView.swift         — Networks grouped by SSID, AP-count badge, password prompt
 └── SettingsView.swift            — TabView: General / Locations / About
+
+WifiManagerTests/
+├── NetworkQualityTests.swift     — NetworkQuality.from(rssi:latency:) scoring
+├── UsageProfileTests.swift       — UsageType.quality(latency:download:) thresholds
+├── LocationProfileTests.swift    — matches(location:), coordinate, Codable round-trip
+└── NetworkMetricsTests.swift     — snr, rssiBarValue clamping, quality delegation
 ```
 
 ## Data Flow
 
 ### Startup
 1. `WifiManagerApp` creates `WiFiMonitor` and `LocationProfileManager` as `@StateObject`
-2. `WiFiMonitor.init`: registers `CWEventDelegate` events + starts `NWPathMonitor` + `Task { await refresh() }` + fallback poll timer
+2. `WiFiMonitor.init`: registers `UserDefaults` defaults + `CWEventDelegate` events, wires `ConnectionTypeDetector.onPathUpdate` → refresh, requests notification permission once, `Task { await refresh() }` + fallback poll timer
 3. `refresh()` reads `CWInterface` (SSID, RSSI, noise, link speed), calls `NetworkQualityChecker.measureLatency()`
 4. Updates `status`, `metrics`, `usageScores` → SwiftUI re-renders the icon and popover
 
@@ -130,16 +140,30 @@ WifiManager/Sources/
 4. `StatusHeaderView` badge uses `symbolEffect(.pulse, isActive: isSearching)` (macOS 14 API)
 
 ### Hotspot Detection
-1. `ConnectionTypeDetector` maintains a dedicated `NWPathMonitor`
+1. `ConnectionTypeDetector` owns the app's **single** `NWPathMonitor`
 2. `NWPath.isExpensive == true` → expensive connection (iPhone/Android hotspot, cellular)
 3. `WiFiMonitor` emits `ConnectionStatus.hotspot(quality:)` instead of `.wifi(quality:)`
 4. Menu bar icon shows `personalhotspot` symbol; popover badge shows orange hotspot icon
 
+> **Single path monitor** — `ConnectionTypeDetector.onPathUpdate` fires on the main
+> actor *after* `currentPath` is updated, then triggers `WiFiMonitor.refresh()`. This
+> replaced an earlier design with two parallel `NWPathMonitor`s, which could feed
+> `refresh()` a stale `isExpensive` (one-event lag → flickering hotspot badge).
+
 ### Latency Measurement
 1. `NetworkQualityChecker.measureLatency()`: HEAD request to `apple.com/library/test/success.html`
 2. Result cached for 30 s to avoid unnecessary requests
-3. Cache invalidated on path change (`NWPathMonitor`) or reconnect
+3. Cache invalidated on path change or reconnect
 4. Latency feeds `NetworkQuality.from(rssi:latency:)` and `UsageType.quality(latency:download:)`
+
+### Download Speed (opt-in)
+1. Enabled via Preferences → Monitoring (`enableSpeedTest`, off by default)
+2. `NetworkQualityChecker.measureDownloadSpeed(isExpensive:)`: GETs a sized payload
+   from `speed.cloudflare.com/__down?bytes=2000000`, computes Mbps
+3. **Skipped on metered links** (`isExpensive`) to preserve hotspot data; cached 180 s
+4. Measured off the refresh lock (`maybeMeasureDownload`) so it never blocks state updates;
+   the result patches `NetworkMetrics.download` and recomputes usage scores
+5. Feeds the download branch of `UsageType.quality(latency:download:)` (previously always nil)
 
 ### Usage Scores
 Each `UsageType` defines a `(latencyMs, downloadMbps)` threshold. Score is computed as:
@@ -155,11 +179,20 @@ Each `UsageType` defines a `(latencyMs, downloadMbps)` threshold. Score is compu
 4. Secured network → inline password prompt → `associate(to:password:pwd)`
 5. Known network (in keychain) → `associate(to:password:nil)` (CoreWLAN reads the keychain)
 
-### Location Profiles
+### Location Profiles & Auto-Switch
 1. `LocationProfileManager` manages `[LocationProfile]` persisted as JSON in `UserDefaults`
-2. `CLLocationManager` with `distanceFilter: 100 m` and `desiredAccuracy: 100 m`
-3. On position change, `matchProfile(to:)` compares against `CLLocation.distance`
-4. The active profile is shown in the popover footer
+2. `CLLocationManager` with `distanceFilter: 100 m` and `desiredAccuracy: 100 m`; `lastKnownLocation`
+   is published so the Preferences form can stamp a profile's coordinates ("Use my current location")
+3. On position change, `matchProfile(to:)` compares against `CLLocation.distance`; on a genuine
+   **transition into** a profile's radius it fires `onProfileEnter(profile)`
+4. The app wires `onProfileEnter` → `WiFiMonitor.connect(toSSID:)`, gated by the opt-in
+   `autoSwitchByLocation` setting and a no-op if already on that SSID. The two services stay
+   decoupled — the closure is the only bridge, set in `WifiManagerApp` where both are in scope
+5. The active profile is shown in the popover footer
+
+> Earlier the Locations tab was cosmetic: the add form never captured coordinates
+> (so `matches` always returned false) and a match never switched networks. Both gaps
+> are now closed.
 
 ## Release Pipeline
 
@@ -210,3 +243,7 @@ Each `UsageType` defines a `(latencyMs, downloadMbps)` threshold. Score is compu
 - **`NWPath.isExpensive`**: reliable for detecting iPhone Personal Hotspot and Android tethering, but returns `false` if the Mac is connected via Ethernet through the phone (rare).
 - **Location permission**: not requested at launch. The user enables location profiles in Settings, which triggers the permission prompt.
 - **`isRefreshing` guard**: prevents overlapping `refresh()` calls when multiple CoreWLAN events fire in rapid succession (e.g., during roaming: `bssidDidChange` + `linkDidChange` + `ssidDidChange`).
+- **Strict concurrency**: set to `targeted` (was `minimal`). `complete` builds but surfaces 4 future-Swift-6 diagnostics — notably non-`Sendable` `Timer` access in the nonisolated `deinit` — deferred to a dedicated Swift 6 migration pass.
+- **Localization**: a custom `Strings` struct switched at runtime via `LanguageManager` + the `appLanguage` UserDefault. A String Catalog (`.xcstrings`) was deliberately **not** adopted: it resolves on the system locale and would break the in-app FR/EN toggle. `WiFiMonitor` builds its `Strings` from the same UserDefault, so notifications/errors localize without coupling to `LanguageManager`.
+- **Tests**: `WifiManagerTests` covers pure logic (quality scoring, metric math, location matching). The test bundle is signed with the host's Team ID (`KFLACS69T9`) — the hardened-runtime host enforces library validation and rejects an adhoc-signed bundle. Run with `xcodebuild -scheme WifiManager -destination 'platform=macOS' test`.
+- **`.sparkle-tools` symlink** → `../MarkdownViewer/.sparkle-tools`: machine-specific release tooling (gitignored). `Scripts/fetch-sparkle-tools.sh` repopulates it on a fresh checkout.

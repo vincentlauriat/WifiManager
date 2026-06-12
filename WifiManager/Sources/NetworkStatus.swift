@@ -96,6 +96,9 @@ struct NetworkMetrics {
     let channel: Int?
     let latency: Double?
     let isExpensive: Bool
+    /// Measured download throughput in Mbps, `nil` when the speed test is disabled,
+    /// pending, or skipped (metered link).
+    var download: Double? = nil
 
     var snr: Int { rssi - noise }
 

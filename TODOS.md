@@ -1,20 +1,31 @@
 # TODOS — WifiManager
 
-## Backlog — v1.2+
+## Backlog — v1.3+
 
-- [ ] Real download speed test via URLSession against a dedicated endpoint
 - [ ] 24-hour RSSI and latency history chart (SwiftUI Charts)
 - [ ] CSV export of metrics (RSSI, latency, speed) for a chosen time range
 - [ ] Multi-interface support (multiple WiFi adapters)
 - [ ] Global keyboard shortcut to open the popover
+- [ ] Known-networks management (forget/prioritize) — needs SCPreferences / CWConfiguration + admin auth
+- [ ] String Catalog (`.xcstrings`) migration — only if the runtime FR/EN toggle is dropped (locale-driven)
+- [ ] Full Swift 6 `complete` concurrency — resolve non-Sendable Timer access in `deinit`
 
 ## In progress — v1.2
 
+### Features
+- [x] Real download speed test (opt-in, Cloudflare sized download, skipped on metered links)
+- [x] Location-based auto-switch: capture current position + switch to preferred SSID on entry (opt-in)
 - [x] System notifications: alert on connection loss and on hotspot switch (localized, opt-in toggles)
+- [x] VoiceOver accessibility labels on icon-only buttons
+
+### Fixes / quality
+- [x] Locations feature made functional (was cosmetic: no coordinate capture, no network switch)
 - [x] Localize notification + connection-error strings via `Strings`
 - [x] Request notification permission once at launch (was per-alert)
 - [x] Consolidate to a single `NWPathMonitor` (removes dual-monitor path race)
-- [x] Dynamic version string in About tab
+- [x] Dynamic version string in About tab + single source of truth in `project.yml`
+- [x] `SWIFT_STRICT_CONCURRENCY` minimal → targeted (+ 2 real concurrency fixes)
+- [x] Unit test target (`WifiManagerTests`, 20 tests)
 
 ## Done — v1.1 (released 2026-06-12)
 

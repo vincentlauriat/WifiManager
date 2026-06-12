@@ -1,8 +1,9 @@
 # WifiManager
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue)
+![Version](https://img.shields.io/badge/version-1.2.0-blue)
 ![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)
 ![Swift](https://img.shields.io/badge/swift-5.9-orange)
+![Tests](https://img.shields.io/badge/tests-20%20passing-brightgreen)
 
 A lightweight macOS menu bar app that monitors your WiFi connection quality in real time, distinguishes real networks from iPhone hotspots, and scores connection suitability per use case.
 
@@ -27,15 +28,18 @@ Open the DMG, drag WifiManager to Applications, and launch. No configuration nee
 | Feature | Description |
 |---|---|
 | Live signal metrics | RSSI, latency, link speed, SNR with animated bars |
+| Download speed test | Optional real throughput measurement; skipped on hotspots to save data |
 | Hotspot detection | Automatically detects iPhone Personal Hotspot via `NWPathMonitor` |
 | Usage scores | Per-use quality rating: Email, Browsing, Video Call, Gaming, Streaming |
+| Notifications | Optional alerts on connection loss and on switching to a hotspot |
 | Network scanner | Lists nearby WiFi networks grouped by SSID; join directly with password prompt |
 | WiFi toggle | Enable or disable WiFi from the menu bar popover |
 | Auto-reconnect | Automatically retries connection when disconnected (configurable interval) |
 | Launch at login | Start WifiManager automatically at login via `SMAppService` |
-| Location profiles | Save location/SSID pairs for automatic network suggestions |
+| Location auto-switch | Capture a location and auto-switch to its preferred SSID on arrival (opt-in) |
 | Replace system icon | Guide to hide the native macOS WiFi icon and use WifiManager instead |
 | FR / EN interface | Language switcher in Preferences → General |
+| Accessibility | VoiceOver labels on all icon-only controls |
 | Auto-update | Sparkle 2 integration — prompted on new releases, never silent |
 | Menu bar icon | Color-coded icon (green / orange / red) with searching pulse animation |
 
@@ -50,6 +54,8 @@ Open the DMG, drag WifiManager to Applications, and launch. No configuration nee
 | Network path | Network framework (`NWPathMonitor`) |
 | Location | CoreLocation |
 | Auto-update | [Sparkle 2](https://sparkle-project.org) |
+| Tests | XCTest (`WifiManagerTests`, 20 unit tests) |
+| Concurrency | Swift Concurrency (`@MainActor`, `SWIFT_STRICT_CONCURRENCY: targeted`) |
 | Project generation | [XcodeGen](https://github.com/yonaskolb/XcodeGen) |
 
 ---
@@ -66,6 +72,13 @@ Open the DMG, drag WifiManager to Applications, and launch. No configuration nee
 git clone https://github.com/vincentlauriat/WifiManager.git
 cd WifiManager
 ./Scripts/build.sh
+```
+
+### Running tests
+
+```bash
+xcodegen generate
+xcodebuild -scheme WifiManager -destination 'platform=macOS' test
 ```
 
 ---
@@ -102,6 +115,7 @@ WifiManager/
         ├── UsageScoresView.swift
         ├── NetworkListView.swift          # Networks grouped by SSID with AP count badge
         └── SettingsView.swift
+└── WifiManagerTests/                  # XCTest unit tests (quality, metrics, location)
 ```
 
 ---
@@ -143,9 +157,13 @@ WifiManager uses [Sparkle 2](https://sparkle-project.org) for update checks.
 - [x] Auto-reconnect when disconnected
 - [x] Event-driven state updates (CWEventDelegate)
 - [x] Notarized DMG release pipeline
-- [ ] Download speed measurement
-- [ ] Notification center alerts on disconnect / hotspot switch
+- [x] Download speed measurement (opt-in)
+- [x] Notification center alerts on disconnect / hotspot switch
+- [x] Location-based auto-switch
+- [x] Unit test suite
 - [ ] 24-hour RSSI and latency history chart
+- [ ] CSV export of metrics
+- [ ] Known-networks management (forget / prioritize)
 - [ ] iCloud sync for location profiles
 
 ---

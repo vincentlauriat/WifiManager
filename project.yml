@@ -20,7 +20,7 @@ settings:
     ENABLE_HARDENED_RUNTIME: YES
     ENABLE_USER_SCRIPT_SANDBOXING: NO
     ENABLE_APP_SANDBOX: NO
-    SWIFT_STRICT_CONCURRENCY: minimal
+    SWIFT_STRICT_CONCURRENCY: targeted
     MACOSX_DEPLOYMENT_TARGET: "14.0"
 
 targets:
@@ -37,8 +37,8 @@ targets:
       path: WifiManager/Info.plist
       properties:
         CFBundleDisplayName: WifiManager
-        CFBundleShortVersionString: "1.1.0"
-        CFBundleVersion: "2"
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         LSMinimumSystemVersion: "14.0"
         LSUIElement: true
         NSHighResolutionCapable: true
@@ -55,10 +55,30 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.vincent.WifiManager
         PRODUCT_NAME: WifiManager
-        MARKETING_VERSION: "1.1.0"
-        CURRENT_PROJECT_VERSION: "2"
+        MARKETING_VERSION: "1.2.0"
+        CURRENT_PROJECT_VERSION: "3"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         COMBINE_HIDPI_IMAGES: YES
         CODE_SIGN_IDENTITY: "Developer ID Application"
         CODE_SIGN_STYLE: Manual
+    scheme:
+      testTargets:
+        - WifiManagerTests
+
+  WifiManagerTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: WifiManagerTests
+    dependencies:
+      - target: WifiManager
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.vincent.WifiManagerTests
+        GENERATE_INFOPLIST_FILE: YES
+        # Match the host's Team ID — the hardened-runtime host enforces library
+        # validation and rejects a differently-signed (adhoc) test bundle.
+        CODE_SIGN_IDENTITY: "Developer ID Application"
+        CODE_SIGN_STYLE: Manual
+        DEVELOPMENT_TEAM: "KFLACS69T9"

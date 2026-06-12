@@ -16,10 +16,8 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    DEVELOPMENT_TEAM: ""
-    CODE_SIGN_STYLE: Automatic
-    CODE_SIGN_IDENTITY: "-"
-    ENABLE_HARDENED_RUNTIME: NO
+    DEVELOPMENT_TEAM: "KFLACS69T9"
+    ENABLE_HARDENED_RUNTIME: YES
     ENABLE_USER_SCRIPT_SANDBOXING: NO
     ENABLE_APP_SANDBOX: NO
     SWIFT_STRICT_CONCURRENCY: minimal
@@ -49,7 +47,7 @@ targets:
         NSLocationWhenInUseUsageDescription: "WifiManager utilise votre localisation pour suggérer le meilleur réseau WiFi selon votre lieu."
         NSLocationAlwaysAndWhenInUseUsageDescription: "WifiManager utilise votre localisation pour changer automatiquement de réseau WiFi selon votre lieu."
         SUFeedURL: "https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/appcast.xml"
-        SUPublicEDKey: "fsT0Pbi8A8rd6ppCaWbnRMVy+YvJ+v/uVJxU78GqdW4="
+        SUPublicEDKey: "9PD2SBwLL4XoycyAGzaE+gO7ctuxSfuFMMajiZdXhXQ="
         SUEnableAutomaticChecks: true
         SUScheduledCheckInterval: 86400
         SUAutomaticallyUpdate: false
@@ -62,3 +60,5 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         COMBINE_HIDPI_IMAGES: YES
+        CODE_SIGN_IDENTITY: "Developer ID Application"
+        CODE_SIGN_STYLE: Manual

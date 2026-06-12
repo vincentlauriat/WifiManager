@@ -1,5 +1,11 @@
 # Changelog — WifiManager
 
+## [Unreleased]
+
+### Added
+- `Scripts/release.sh` : pipeline de release complet (build Release → codesign Developer ID + Hardened Runtime → notarisation Apple → staple → DMG avec layout Finder → signature EdDSA Sparkle → `appcast.xml`)
+- `Scripts/make-dmg-background.swift` : génère le fond DMG (flèche app → Applications, fenêtre 540×380)
+
 ## [1.1.0] — 2026-06-06
 
 ### Added

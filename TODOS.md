@@ -1,20 +1,17 @@
 # TODOS — WifiManager
 
-## Backlog — v1.1
+## Backlog — v1.2+
 
 - [ ] Real download speed test via URLSession against a dedicated endpoint
 - [ ] System notifications: alert on connection loss or quality degradation
 - [ ] 24-hour RSSI and latency history chart (SwiftUI Charts)
-
-## Backlog — v1.2
-
 - [ ] CSV export of metrics (RSSI, latency, speed) for a chosen time range
 - [ ] Multi-interface support (multiple WiFi adapters)
 - [ ] Global keyboard shortcut to open the popover
-- [ ] Custom app icon (PNG 512×512)
 
-## Done — v1.1 (unreleased)
+## Done — v1.1 (released 2026-06-12)
 
+### Features
 - [x] Launch at login via SMAppService (macOS 13+)
 - [x] WiFi global toggle (enable/disable via CWInterface.setPower)
 - [x] Guide to replace the native WiFi system icon (System Settings → Control Center)
@@ -25,6 +22,14 @@
 - [x] Poll timer fixed: now a one-shot fallback that respects the Preferences interval
 - [x] Menu bar icon fix: replaced non-existent globe.slash with wifi.slash
 - [x] Menu bar icon: wifi / personalhotspot / wifi.slash instead of globe
+
+### Release pipeline
+- [x] `Scripts/release.sh` — build Release → codesign Developer ID + Hardened Runtime → notarise Apple → staple → DMG Finder layout → Sparkle EdDSA → appcast.xml
+- [x] `Scripts/make-dmg-background.swift` — fond DMG 540×380 avec flèche app → Applications
+- [x] `Scripts/fetch-sparkle-tools.sh` — téléchargement one-time des outils Sparkle
+- [x] `.sparkle-tools` symlink → MarkdownViewer/.sparkle-tools (partagé)
+- [x] Notary profile `AppliMacVincentGithub` (keychain), clé EdDSA `MarkdownViewer` account
+- [x] Release GitHub v1.1.0 : DMG notarisé + appcast.xml poussé sur main
 
 ## Done — v1.0 (released 2026-06-05)
 

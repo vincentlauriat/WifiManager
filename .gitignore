@@ -24,6 +24,8 @@ Package.resolved
 
 # Release artifacts
 *.dmg
+*.zip
+.sparkle-tools/
 
 # Perso
 COMMANDS.md

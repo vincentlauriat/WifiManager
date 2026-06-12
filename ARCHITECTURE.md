@@ -161,6 +161,46 @@ Each `UsageType` defines a `(latencyMs, downloadMbps)` threshold. Score is compu
 3. On position change, `matchProfile(to:)` compares against `CLLocation.distance`
 4. The active profile is shown in the popover footer
 
+## Release Pipeline
+
+```
+./Scripts/release.sh <version>
+        │
+        ├─ 1. Sanity check   MARKETING_VERSION in project.yml == <version>
+        ├─ 2. xcodegen generate
+        ├─ 3. xcodebuild Release  (CODE_SIGNING_ALLOWED=NO)
+        ├─ 4. ditto → staging dir  (strip com.apple.provenance xattrs)
+        ├─ 5. codesign --options runtime --timestamp
+        │       Sparkle.framework/Autoupdate
+        │       Sparkle.framework/XPCServices/Downloader.xpc
+        │       Sparkle.framework/XPCServices/Installer.xpc
+        │       Sparkle.framework/Updater.app
+        │       Sparkle.framework
+        │       WifiManager.app
+        ├─ 6. hdiutil create UDRW  →  AppleScript Finder layout  →  hdiutil convert UDZO
+        │       window 540×380, icon size 128, background arrow image
+        │       WifiManager.app at (140, 200) · Applications alias at (400, 200)
+        ├─ 7. xcrun notarytool submit --wait  (profile: AppliMacVincentGithub)
+        ├─ 8. xcrun stapler staple + validate
+        ├─ 9. sign_update --account "MarkdownViewer"  →  EdDSA signature
+        └─ 10. write appcast.xml
+```
+
+| Tool | Role |
+|---|---|
+| `Scripts/release.sh` | Orchestrates the full pipeline |
+| `Scripts/make-dmg-background.swift` | Generates the DMG background PNG (Swift + AppKit, no dependencies) |
+| `Scripts/fetch-sparkle-tools.sh` | Downloads Sparkle tools once into `.sparkle-tools/` (symlink → MarkdownViewer) |
+| `codesign --options runtime` | Enables Hardened Runtime — required for Apple notarisation |
+| `xcrun notarytool` | Apple notarisation — stapled ticket allows Gatekeeper bypass offline |
+| `sign_update` | Signs the DMG with the shared EdDSA private key (account `MarkdownViewer` in keychain) |
+| `appcast.xml` | Sparkle feed hosted at `raw.githubusercontent.com/…/main/appcast.xml` |
+
+**Prerequisites (one-time per machine):**
+- Developer ID Application certificate in login keychain (`KFLACS69T9`)
+- Notary profile: `xcrun notarytool store-credentials "AppliMacVincentGithub" --apple-id "vincent@lauriat.fr" --team-id "KFLACS69T9"`
+- Sparkle EdDSA private key in keychain (account `MarkdownViewer`) — shared with MarkdownViewer and NetCheck
+
 ## Notes
 
 - **Non-sandboxed**: required for `CWWiFiClient` to scan and associate without a specific Apple Developer entitlement.

@@ -27,6 +27,15 @@ struct MetricsView: View {
                 bar: min(1.0, metrics.transmitRate / 600),
                 color: .blue
             )
+            if let download = metrics.download {
+                MetricRow(
+                    icon: "arrow.down.circle",
+                    label: lang.s.downloadSpeed,
+                    value: String(format: "%.0f Mbps", download),
+                    bar: min(1.0, download / 200),
+                    color: .teal
+                )
+            }
             if metrics.snr > 0 {
                 MetricRow(
                     icon: "waveform.path.ecg",

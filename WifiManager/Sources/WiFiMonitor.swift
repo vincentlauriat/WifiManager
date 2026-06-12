@@ -15,6 +15,12 @@ class WiFiMonitor: NSObject, ObservableObject {
     @Published var isReconnecting = false
     @Published var lastUpdated: Date?
     @Published var connectionError: String?
+    /// macOS hides WiFi SSIDs (scan + current network) until Location is granted.
+    @Published var isLocationAuthorized = false
+    /// True only while status is `.notDetermined` — the only state where the
+    /// native permission popup can still be shown (macOS forbids re-prompting
+    /// after a denial; Settings is then the only path).
+    @Published var canRequestLocation = false
 
     private let wifiClient = CWWiFiClient.shared()
     private let typeDetector = ConnectionTypeDetector()
@@ -34,8 +40,12 @@ class WiFiMonitor: NSObject, ObservableObject {
             "notifyOnDisconnect": true,
             "notifyOnHotspot": true,
             "showHotspotBadge": true,
+            "enableSpeedTest": false,
+            "autoSwitchByLocation": false,
         ])
         locationManager.delegate = self
+        isLocationAuthorized = locationManager.authorizationStatus == .authorizedAlways
+        canRequestLocation = locationManager.authorizationStatus == .notDetermined
         if locationManager.authorizationStatus == .notDetermined {
             locationManager.requestWhenInUseAuthorization()
         }
@@ -125,6 +135,23 @@ class WiFiMonitor: NSObject, ObservableObject {
         self.usageScores = qualityChecker.computeUsageScores(metrics: m)
         self.status = isExpensive ? .hotspot(quality: m.quality) : .wifi(quality: m.quality)
         cancelAutoReconnect()
+        maybeMeasureDownload(for: m)
+    }
+
+    /// Enriches the current metrics with a download measurement, off the refresh
+    /// lock so it never blocks state updates. Opt-in and skipped on metered links.
+    private func maybeMeasureDownload(for m: NetworkMetrics) {
+        guard UserDefaults.standard.bool(forKey: "enableSpeedTest"), !m.isExpensive else { return }
+        Task { [weak self] in
+            guard let self else { return }
+            let download = await self.qualityChecker.measureDownloadSpeed(isExpensive: m.isExpensive)
+            guard let download,
+                  var current = self.metrics,
+                  current.ssid == m.ssid, current.bssid == m.bssid else { return }
+            current.download = download
+            self.metrics = current
+            self.usageScores = self.qualityChecker.computeUsageScores(metrics: current)
+        }
     }
 
     func reconnect() async {
@@ -142,6 +169,21 @@ class WiFiMonitor: NSObject, ObservableObject {
         }
 
         isReconnecting = false
+        await refresh()
+    }
+
+    /// Shows the native Location permission popup. No-op (no popup) once the user
+    /// has answered once — macOS only prompts while status is `.notDetermined`.
+    func requestLocationPermission() {
+        locationManager.requestWhenInUseAuthorization()
+    }
+
+    /// Connects to a network by SSID name (used by location-based auto-switch).
+    /// No-op if WiFi is off or we are already associated to that SSID.
+    func connect(toSSID ssid: String) async {
+        guard let interface = wifiClient.interface(), interface.powerOn() else { return }
+        guard interface.ssid() != ssid else { return }
+        await scanAndConnect(ssid: ssid, on: interface)
         await refresh()
     }
 
@@ -297,7 +339,12 @@ class WiFiMonitor: NSObject, ObservableObject {
 // Relaie le SSID dès que la permission localisation est accordée
 extension WiFiMonitor: CLLocationManagerDelegate {
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        Task { @MainActor in await self.refresh() }
+        let status = manager.authorizationStatus
+        Task { @MainActor in
+            self.isLocationAuthorized = status == .authorizedAlways
+            self.canRequestLocation = status == .notDetermined
+            await self.refresh()
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 import SwiftUI
 import Sparkle
 import ServiceManagement
+import CoreLocation
 
 struct SettingsView: View {
     @EnvironmentObject var lang: LanguageManager
@@ -24,6 +25,7 @@ private struct GeneralTab: View {
     @AppStorage("pollInterval") private var pollInterval: Double = 30
     @AppStorage("autoReconnectInterval") private var autoReconnectInterval: Double = 20
     @AppStorage("showHotspotBadge") private var showHotspotBadge = true
+    @AppStorage("enableSpeedTest") private var enableSpeedTest = false
     @AppStorage("notifyOnDisconnect") private var notifyOnDisconnect = true
     @AppStorage("notifyOnHotspot") private var notifyOnHotspot = true
     @State private var launchAtLoginEnabled = SMAppService.mainApp.status == .enabled
@@ -39,6 +41,12 @@ private struct GeneralTab: View {
                     Text("5 min").tag(300.0)
                 }
                 Toggle(lang.s.hotspotBadge, isOn: $showHotspotBadge)
+                Toggle(lang.s.enableSpeedTest, isOn: $enableSpeedTest)
+                if enableSpeedTest {
+                    Text(lang.s.enableSpeedTestNote)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             Section(lang.s.autoReconnect) {
                 Picker(lang.s.reconnectIntervalLabel, selection: $autoReconnectInterval) {
@@ -97,9 +105,11 @@ private struct GeneralTab: View {
 private struct LocationTab: View {
     @EnvironmentObject var locationManager: LocationProfileManager
     @EnvironmentObject var lang: LanguageManager
+    @AppStorage("autoSwitchByLocation") private var autoSwitchByLocation = false
     @State private var showAdd = false
     @State private var newName = ""
     @State private var newSSID = ""
+    @State private var capturedLocation: CLLocation?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -107,6 +117,11 @@ private struct LocationTab: View {
                locationManager.authorizationStatus == .restricted {
                 locationWarning
             }
+
+            Toggle(lang.s.autoSwitchByLocation, isOn: $autoSwitchByLocation)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+            Divider()
 
             List {
                 ForEach(locationManager.profiles) { profile in
@@ -125,7 +140,7 @@ private struct LocationTab: View {
             HStack {
                 Button {
                     withAnimation { showAdd.toggle() }
-                    newName = ""; newSSID = ""
+                    newName = ""; newSSID = ""; capturedLocation = nil
                 } label: {
                     Label(
                         showAdd ? lang.s.cancel : lang.s.addLocation,
@@ -162,18 +177,47 @@ private struct LocationTab: View {
     }
 
     private var addForm: some View {
-        HStack(spacing: 8) {
-            TextField(lang.s.locationName, text: $newName)
-                .textFieldStyle(.roundedBorder)
-            TextField(lang.s.networkSSID, text: $newSSID)
-                .textFieldStyle(.roundedBorder)
-            Button(lang.s.add) {
-                guard !newName.isEmpty, !newSSID.isEmpty else { return }
-                locationManager.add(profile: LocationProfile(name: newName, preferredSSID: newSSID))
-                newName = ""; newSSID = ""; showAdd = false
+        VStack(spacing: 6) {
+            HStack(spacing: 8) {
+                TextField(lang.s.locationName, text: $newName)
+                    .textFieldStyle(.roundedBorder)
+                TextField(lang.s.networkSSID, text: $newSSID)
+                    .textFieldStyle(.roundedBorder)
+                Button(lang.s.add) {
+                    guard !newName.isEmpty, !newSSID.isEmpty else { return }
+                    locationManager.add(profile: LocationProfile(
+                        name: newName,
+                        preferredSSID: newSSID,
+                        latitude: capturedLocation?.coordinate.latitude,
+                        longitude: capturedLocation?.coordinate.longitude
+                    ))
+                    newName = ""; newSSID = ""; capturedLocation = nil; showAdd = false
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(newName.isEmpty || newSSID.isEmpty)
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(newName.isEmpty || newSSID.isEmpty)
+
+            HStack(spacing: 6) {
+                Button {
+                    capturedLocation = locationManager.lastKnownLocation
+                } label: {
+                    Label(
+                        capturedLocation != nil ? lang.s.locationCaptured : lang.s.useCurrentLocation,
+                        systemImage: capturedLocation != nil ? "checkmark.circle.fill" : "location"
+                    )
+                    .font(.caption)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .foregroundStyle(capturedLocation != nil ? Color.green : Color.accentColor)
+
+                if locationManager.lastKnownLocation == nil {
+                    Text(lang.s.locationUnavailable)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)

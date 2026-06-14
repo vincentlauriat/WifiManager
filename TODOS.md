@@ -10,7 +10,7 @@
 - [ ] String Catalog (`.xcstrings`) migration — only if the runtime FR/EN toggle is dropped (locale-driven)
 - [ ] Full Swift 6 `complete` concurrency — resolve non-Sendable Timer access in `deinit`
 
-## In progress — v1.2
+## Done — v1.2 (released 2026-06-12)
 
 ### Features
 - [x] Real download speed test (opt-in, Cloudflare sized download, skipped on metered links)

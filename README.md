@@ -17,7 +17,7 @@ A lightweight macOS menu bar app that monitors your WiFi connection quality in r
 
 ## Download
 
-**[WifiManager-1.1.0.dmg](https://github.com/vincentlauriat/WifiManager/releases/download/v1.1.0/WifiManager-1.1.0.dmg)** — macOS 14+ · Developer ID signed · Notarized by Apple
+**[WifiManager-1.2.0.dmg](https://github.com/vincentlauriat/WifiManager/releases/download/v1.2.0/WifiManager-1.2.0.dmg)** — macOS 14+ · Developer ID signed · Notarized by Apple
 
 Open the DMG, drag WifiManager to Applications, and launch. No configuration needed.
 

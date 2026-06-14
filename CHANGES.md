@@ -1,6 +1,6 @@
 # Changelog — WifiManager
 
-## [1.2.0] — Unreleased
+## [1.2.0] — 2026-06-12
 
 ### Added
 - **Real download speed test** (opt-in, Preferences → Monitoring): sized download against Cloudflare, shown as a "Download" metric row and feeding the per-use quality scores. Skipped on metered links (hotspots) to preserve data; cached 180 s

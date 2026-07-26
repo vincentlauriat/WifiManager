@@ -11,11 +11,15 @@
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230891b2'/%3E%3Cg fill='none' stroke='white' stroke-width='7' stroke-linecap='round'%3E%3Cpath d='M30 52 a28 28 0 0 1 40 0'/%3E%3Cpath d='M40 63 a14 14 0 0 1 20 0'/%3E%3C/g%3E%3Ccircle cx='50' cy='73' r='5.5' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/base.css">
 <style>
   :root{
     --bg:#ffffff; --bg-soft:#f3f8fa; --panel:#ffffff; --line:#dfe8ed;
     --ink:#0e1f26; --muted:#5a6b73; --faint:#8499a1;
-    --accent:#0891b2; --accent-deep:#0a6e87; --accent-soft:#d6f1f8; --ok:#0e9f6e;
+    --accent:#0891b2; --accent-deep:#0a6e87; --accent-soft:#d6f1f8; --ok:#0e9f6e; --on-accent:#08090d;
     --maxw:1100px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -23,7 +27,7 @@
   body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,"Cascadia Code",monospace}
+  .mono{font-family:var(--font-mono)}
 
   nav{position:sticky;top:0;z-index:20;backdrop-filter:saturate(180%) blur(12px);background:rgba(255,255,255,.8);border-bottom:1px solid var(--line)}
   nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
@@ -33,7 +37,7 @@
   .nav-links a:hover{color:var(--ink)}
   .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:11px;font-weight:650;font-size:15px;transition:transform .12s ease,box-shadow .12s ease,background .12s}
   .btn:hover{transform:translateY(-1px)}
-  .btn-primary{background:linear-gradient(135deg,#0891b2,#06b6d4);color:#fff;box-shadow:0 6px 22px rgba(8,145,178,.3)}
+  .btn-primary{background:linear-gradient(135deg,#0891b2,#06b6d4);color:var(--on-accent);box-shadow:0 6px 22px rgba(8,145,178,.3)}
   .btn-ghost{border:1px solid var(--line);color:var(--ink);background:#fff}
   .btn-ghost:hover{border-color:#bcd5dd;background:var(--bg-soft)}
   .btn-sm{padding:8px 15px;font-size:14px;border-radius:9px}
@@ -41,7 +45,7 @@
   header{padding:74px 0 36px;background:radial-gradient(820px 380px at 80% -8%,rgba(8,145,178,.12),transparent 62%),linear-gradient(180deg,#f8fdfe,#fff 70%)}
   .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
   .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;color:var(--muted);padding:6px 13px;border-radius:999px;font-size:13px;margin-bottom:22px}
-  .pill b{color:var(--accent)}
+  .pill b{color:var(--accent-deep)}
   h1{font-size:clamp(36px,5.4vw,57px);line-height:1.05;font-weight:820;letter-spacing:-1.6px}
   h1 .grad{background:linear-gradient(120deg,#06b6d4,#0a6e87);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   .sub{max-width:540px;margin:20px 0 0;font-size:clamp(16px,2vw,19px);color:var(--muted)}
@@ -52,7 +56,7 @@
   .hero-shot img{width:300px;max-width:100%;border-radius:16px;border:1px solid var(--line);box-shadow:0 30px 70px rgba(8,40,52,.22)}
 
   section{padding:74px 0;border-top:1px solid var(--line)}
-  .eyebrow{color:var(--accent);font-weight:700;font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase}
+  .eyebrow{color:var(--accent-deep);font-weight:700;font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase}
   .center{text-align:center}.center .eyebrow{display:block}
   h2{font-size:clamp(27px,3.7vw,38px);font-weight:800;letter-spacing:-.7px;margin:9px 0 12px}
   .lead{color:var(--muted);max-width:640px;font-size:17px}
@@ -81,28 +85,21 @@
 
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:42px;counter-reset:s}
   .step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;position:relative}
-  .step::before{counter-increment:s;content:counter(s);position:absolute;top:-14px;left:22px;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0891b2,#06b6d4);color:#fff;font-weight:800;display:grid;place-items:center;font-size:15px}
+  .step::before{counter-increment:s;content:counter(s);position:absolute;top:-14px;left:22px;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0891b2,#06b6d4);color:var(--on-accent);font-weight:800;display:grid;place-items:center;font-size:15px}
   .step h3{margin:6px 0 5px;font-size:16px}
   .step p{color:var(--muted);font-size:14.5px}
 
   .final{text-align:center;background:radial-gradient(620px 280px at 50% 120%,rgba(8,145,178,.12),transparent 66%)}
   .final .cta{justify-content:center}
   footer{border-top:1px solid var(--line);padding:34px 0;color:var(--muted);font-size:14px;text-align:center}
-  footer a{color:var(--accent);font-weight:600}
-  code{background:#0e1f26;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font:13px/1.4 ui-monospace,Menlo,monospace;color:#67e8f9}
+  footer a{color:var(--accent-deep);font-weight:600}
+  code{background:#0e1f26;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font:13px/1.4 var(--font-mono);color:#67e8f9}
 
   @media(max-width:880px){.hero-grid{grid-template-columns:1fr;gap:30px}.g3{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}.gallery,.steps{grid-template-columns:1fr}.nav-links a:not(.btn){display:none}}
-
-  /* a11y : respecter la préférence système de mouvement réduit */
-  @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{
-      animation-duration:.01ms !important;animation-iteration-count:1 !important;
-      transition-duration:.01ms !important;scroll-behavior:auto !important;
-    }
-  }
 </style>
 </head>
 <body>
+<a class="skip" href="#top">Skip to content</a>
 
 <nav><div class="wrap">
   <a class="brand" href="#top"><span class="logo"><svg width="19" height="19" viewBox="0 0 100 100"><g fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"><path d="M30 52 a28 28 0 0 1 40 0"/><path d="M40 63 a14 14 0 0 1 20 0"/></g><circle cx="50" cy="73" r="6" fill="#fff"/></svg></span>WifiManager</a>

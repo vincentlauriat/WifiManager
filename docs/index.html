@@ -96,33 +96,49 @@
   code{background:#0e1f26;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font:13px/1.4 var(--font-mono);color:#67e8f9}
 
   @media(max-width:880px){.hero-grid{grid-template-columns:1fr;gap:30px}.g3{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}.gallery,.steps{grid-template-columns:1fr}.nav-links a:not(.btn){display:none}}
+
+  .langtog{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex:none}
+  .langtog button{background:transparent;border:0;color:var(--muted);font:600 12.5px/1 var(--font-mono);
+    padding:0 10px;min-height:36px;cursor:pointer}
+  .langtog button+button{border-left:1px solid var(--line)}
+  .langtog button:hover{color:var(--txt)}
+  .langtog button.on{background:var(--accent);color:var(--on-accent)}
+  /* En francais les libelles de nav sont plus longs qu'en anglais : sous 600px
+     la barre deborde de quelques pixels. On resserre le selecteur plutot que
+     de raccourcir un libelle correct. */
+  @media(max-width:600px){.langtog button{padding:0 7px;font-size:11.5px}}
 </style>
 </head>
 <body>
-<a class="skip" href="#top">Skip to content</a>
+<a class="skip" href="#top"><span class="en">Skip to content</span><span class="fr">Aller au contenu</span><span class="zh">跳至內容</span></a>
 
 <nav><div class="wrap">
   <a class="brand" href="#top"><span class="logo"><svg width="19" height="19" viewBox="0 0 100 100"><g fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"><path d="M30 52 a28 28 0 0 1 40 0"/><path d="M40 63 a14 14 0 0 1 20 0"/></g><circle cx="50" cy="73" r="6" fill="#fff"/></svg></span>WifiManager</a>
   <div class="nav-links">
-    <a href="#features">Features</a>
-    <a href="#scores">Scoring</a>
-    <a href="#install">Install</a>
+    <a href="#features"><span class="en">Features</span><span class="fr">Fonctions</span><span class="zh">功能</span></a>
+    <a href="#scores"><span class="en">Scoring</span><span class="fr">Notation</span><span class="zh">評分</span></a>
+    <a href="#install"><span class="en">Install</span><span class="fr">Installer</span><span class="zh">安裝</span></a>
     <a href="https://github.com/vincentlauriat/WifiManager">GitHub</a>
-    <a class="btn btn-primary btn-sm" href="https://github.com/vincentlauriat/WifiManager/releases/latest">Download</a>
+    <div class="langtog" role="group" aria-label="Language / Langue / 語言">
+    <button type="button" data-lang="en" class="on" onclick="setLang('en')">EN</button>
+    <button type="button" data-lang="fr" onclick="setLang('fr')">FR</button>
+    <button type="button" data-lang="zh" onclick="setLang('zh')">中文</button>
+  </div>
+    <a class="btn btn-primary btn-sm" href="https://github.com/vincentlauriat/WifiManager/releases/latest"><span class="en">Download</span><span class="fr">Télécharger</span><span class="zh">下載</span></a>
   </div>
 </div></nav>
 
 <header id="top"><div class="wrap">
   <div class="hero-grid">
     <div>
-      <span class="pill">📶 Real networks vs <b>iPhone hotspots</b> — told apart automatically</span>
-      <h1>Know what your<br><span class="grad">WiFi can handle.</span></h1>
-      <p class="sub">A lightweight menu bar app that measures your WiFi quality in real time, detects iPhone Personal Hotspots, and scores your connection for what you're actually doing — a video call, a game, a stream.</p>
+      <span class="pill">📶 <span class="en">Real networks vs <b>iPhone hotspots</b> — told apart automatically</span><span class="fr">Vrais réseaux et <b>partages de connexion iPhone</b> — distingués automatiquement</span><span class="zh">真實網路與 <b>iPhone 個人熱點</b>——自動分辨</span></span>
+      <h1><span class="en">Know what your<br><span class="grad">WiFi can handle.</span></span><span class="fr">Sachez ce que votre<br><span class="grad">WiFi encaisse vraiment.</span></span><span class="zh">搞清楚你的 <span class="grad">WiFi 撐得住什麼。</span></span></h1>
+      <p class="sub"><span class="en">A lightweight menu bar app that measures your WiFi quality in real time, detects iPhone Personal Hotspots, and scores your connection for what you're actually doing — a video call, a game, a stream.</span><span class="fr">Une app légère en barre de menus qui mesure la qualité de votre WiFi en temps réel, détecte les partages de connexion iPhone, et note votre lien pour ce que vous faites vraiment — un appel vidéo, une partie, un stream.</span><span class="zh">輕量的選單列應用程式，即時量測你的 WiFi 品質、偵測 iPhone 個人熱點，並針對你當下實際在做的事評分——視訊通話、遊戲、串流。</span></p>
       <div class="cta">
-        <a class="btn btn-primary" href="https://github.com/vincentlauriat/WifiManager/releases/latest">⬇︎ Download for macOS</a>
-        <a class="btn btn-ghost" href="https://github.com/vincentlauriat/WifiManager">View on GitHub</a>
+        <a class="btn btn-primary" href="https://github.com/vincentlauriat/WifiManager/releases/latest">⬇︎ <span class="en">Download for macOS</span><span class="fr">Télécharger pour macOS</span><span class="zh">下載 macOS 版</span></a>
+        <a class="btn btn-ghost" href="https://github.com/vincentlauriat/WifiManager"><span class="en">View on GitHub</span><span class="fr">Voir sur GitHub</span><span class="zh">在 GitHub 上檢視</span></a>
       </div>
-      <p class="meta"><b>Free &amp; open-source (MIT)</b> · macOS 14+ · Signed &amp; notarized · FR / EN</p>
+      <p class="meta"><span class="en"><b>Free &amp; open-source (MIT)</b> · macOS 14+ · Signed &amp; notarized · FR / EN</span><span class="fr"><b>Gratuit et open source (MIT)</b> · macOS 14+ · Signé et notarié · FR / EN</span><span class="zh"><b>免費開源（MIT）</b> · macOS 14+ · 已簽章與公證 · 應用程式語言 FR / EN</span></p>
     </div>
     <div class="hero-shot">
       <img src="https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/Screenshots/popover.png" alt="WifiManager menu bar popover showing live signal metrics and per-use quality scores" loading="eager">
@@ -132,84 +148,112 @@
 
 <section id="features"><div class="wrap">
   <div class="center">
-    <p class="eyebrow">features</p>
-    <h2>More than a signal bar</h2>
-    <p class="lead">CoreWLAN under the hood, a clean SwiftUI popover on top. Everything you need to understand — and fix — a flaky connection.</p>
+    <p class="eyebrow"><span class="en">features</span><span class="fr">fonctions</span><span class="zh">功能</span></p>
+    <h2><span class="en">More than a signal bar</span><span class="fr">Plus qu'une barre de signal</span><span class="zh">不只是一格訊號</span></h2>
+    <p class="lead"><span class="en">CoreWLAN under the hood, a clean SwiftUI popover on top. Everything you need to understand — and fix — a flaky connection.</span><span class="fr">CoreWLAN sous le capot, un popover SwiftUI net au-dessus. Tout pour comprendre — et réparer — une connexion capricieuse.</span><span class="zh">底層是 CoreWLAN，上層是簡潔的 SwiftUI 彈出視窗。理解並修好一條不穩定連線所需的一切。</span></p>
   </div>
   <div class="grid g3">
-    <div class="card"><div class="ico">📊</div><h3>Live signal metrics</h3><p>RSSI, latency, link speed and SNR with animated bars, updated event-driven via CoreWLAN.</p></div>
-    <div class="card"><div class="ico">📱</div><h3>Hotspot detection</h3><p>Spots an iPhone Personal Hotspot automatically via <code class="mono">NWPathMonitor</code> — and skips the speed test to save your data.</p></div>
-    <div class="card"><div class="ico">⚡</div><h3>Download speed test</h3><p>Optional real throughput measurement when you want the full picture.</p></div>
-    <div class="card"><div class="ico">🔎</div><h3>Network scanner</h3><p>Lists nearby networks grouped by SSID with an AP-count badge; join directly with a password prompt.</p></div>
-    <div class="card"><div class="ico">📍</div><h3>Location auto-switch</h3><p>Capture a location and auto-switch to its preferred SSID on arrival — opt-in, via CoreLocation.</p></div>
-    <div class="card"><div class="ico">🔄</div><h3>Auto-reconnect</h3><p>Retries the connection when dropped, at a configurable interval. Toggle WiFi from the popover.</p></div>
-    <div class="card"><div class="ico">🔔</div><h3>Smart notifications</h3><p>Optional alerts on connection loss and when you switch onto a hotspot — never silent.</p></div>
-    <div class="card"><div class="ico">🚀</div><h3>Launch at login &amp; auto-update</h3><p><code class="mono">SMAppService</code> start-up plus Sparkle 2 update prompts — you're always in control.</p></div>
-    <div class="card"><div class="ico">🟢</div><h3>Color-coded icon</h3><p>Green / orange / red menu bar icon with a searching-pulse animation. Hide the native macOS WiFi icon and use this instead.</p></div>
+    <div class="card"><div class="ico">📊</div><h3><span class="en">Live signal metrics</span><span class="fr">Mesures de signal en direct</span><span class="zh">即時訊號指標</span></h3><p><span class="en">RSSI, latency, link speed and SNR with animated bars, updated event-driven via CoreWLAN.</span><span class="fr">RSSI, latence, débit du lien et SNR en barres animées, mis à jour par événements via CoreWLAN.</span><span class="zh">RSSI、延遲、連線速率與 SNR，以動態長條呈現，透過 CoreWLAN 事件驅動更新。</span></p></div>
+    <div class="card"><div class="ico">📱</div><h3><span class="en">Hotspot detection</span><span class="fr">Détection de partage de connexion</span><span class="zh">熱點偵測</span></h3><p><span class="en">Spots an iPhone Personal Hotspot automatically via <code class="mono">NWPathMonitor</code> — and skips the speed test to save your data.</span><span class="fr">Repère automatiquement un partage de connexion iPhone via <code class="mono">NWPathMonitor</code> — et saute le test de débit pour épargner votre forfait.</span><span class="zh">透過 <code class="mono">NWPathMonitor</code> 自動辨識 iPhone 個人熱點——並跳過速度測試以節省你的行動數據。</span></p></div>
+    <div class="card"><div class="ico">⚡</div><h3><span class="en">Download speed test</span><span class="fr">Test de débit descendant</span><span class="zh">下載速度測試</span></h3><p><span class="en">Optional real throughput measurement when you want the full picture.</span><span class="fr">Mesure de débit réel optionnelle, quand vous voulez l'image complète.</span><span class="zh">需要完整資訊時，可選擇進行實際吞吐量量測。</span></p></div>
+    <div class="card"><div class="ico">🔎</div><h3><span class="en">Network scanner</span><span class="fr">Scanner de réseaux</span><span class="zh">網路掃描</span></h3><p><span class="en">Lists nearby networks grouped by SSID with an AP-count badge; join directly with a password prompt.</span><span class="fr">Liste les réseaux proches groupés par SSID avec un badge du nombre de bornes ; rejoignez directement avec une demande de mot de passe.</span><span class="zh">列出附近的網路並依 SSID 分組，附上 AP 數量標籤；可直接連線並輸入密碼。</span></p></div>
+    <div class="card"><div class="ico">📍</div><h3><span class="en">Location auto-switch</span><span class="fr">Bascule automatique par lieu</span><span class="zh">依地點自動切換</span></h3><p><span class="en">Capture a location and auto-switch to its preferred SSID on arrival — opt-in, via CoreLocation.</span><span class="fr">Enregistrez un lieu et basculez automatiquement sur son SSID préféré à l'arrivée — sur activation, via CoreLocation.</span><span class="zh">記錄一個地點，抵達時自動切換到該地點偏好的 SSID——需自行啟用，透過 CoreLocation。</span></p></div>
+    <div class="card"><div class="ico">🔄</div><h3><span class="en">Auto-reconnect</span><span class="fr">Reconnexion automatique</span><span class="zh">自動重連</span></h3><p><span class="en">Retries the connection when dropped, at a configurable interval. Toggle WiFi from the popover.</span><span class="fr">Retente la connexion en cas de coupure, à un intervalle configurable. Activez ou coupez le WiFi depuis le popover.</span><span class="zh">斷線時會依可設定的間隔重試連線。也可從彈出視窗直接開關 WiFi。</span></p></div>
+    <div class="card"><div class="ico">🔔</div><h3><span class="en">Smart notifications</span><span class="fr">Notifications intelligentes</span><span class="zh">智慧通知</span></h3><p><span class="en">Optional alerts on connection loss and when you switch onto a hotspot — never silent.</span><span class="fr">Alertes optionnelles en cas de perte de connexion et lors du passage sur un partage de connexion — jamais silencieux.</span><span class="zh">可選擇在斷線以及切換到熱點時發出提醒——不會默不作聲。</span></p></div>
+    <div class="card"><div class="ico">🚀</div><h3><span class="en">Launch at login &amp; auto-update</span><span class="fr">Lancement à la session et mise à jour auto</span><span class="zh">開機啟動與自動更新</span></h3><p><span class="en"><code class="mono">SMAppService</code> start-up plus Sparkle 2 update prompts — you're always in control.</span><span class="fr">Démarrage via <code class="mono">SMAppService</code> et propositions de mise à jour Sparkle 2 — vous gardez la main.</span><span class="zh">以 <code class="mono">SMAppService</code> 啟動，並由 Sparkle 2 詢問更新——主導權始終在你手上。</span></p></div>
+    <div class="card"><div class="ico">🟢</div><h3><span class="en">Color-coded icon</span><span class="fr">Icône codée par couleur</span><span class="zh">彩色狀態圖示</span></h3><p><span class="en">Green / orange / red menu bar icon with a searching-pulse animation. Hide the native macOS WiFi icon and use this instead.</span><span class="fr">Icône verte / orange / rouge en barre de menus, avec une pulsation pendant la recherche. Masquez l'icône WiFi native de macOS et utilisez celle-ci.</span><span class="zh">綠／橙／紅三色的選單列圖示，搜尋時會有脈動動畫。你可以隱藏 macOS 原生的 WiFi 圖示，改用這一個。</span></p></div>
   </div>
 </div></section>
 
 <section id="scores"><div class="wrap">
   <div class="center">
-    <p class="eyebrow">per-use scoring</p>
-    <h2>Is it good enough for <em>this</em>?</h2>
-    <p class="lead">The same connection can be perfect for email and useless for a video call. WifiManager rates your link for each use case, so you know before it fails.</p>
+    <p class="eyebrow"><span class="en">per-use scoring</span><span class="fr">notation par usage</span><span class="zh">依用途評分</span></p>
+    <h2><span class="en">Is it good enough for <em>this</em>?</span><span class="fr">Est-ce assez bon pour <em>ça</em> ?</span><span class="zh">這條連線撐得住<em>這件事</em>嗎？</span></h2>
+    <p class="lead"><span class="en">The same connection can be perfect for email and useless for a video call. WifiManager rates your link for each use case, so you know before it fails.</span><span class="fr">La même connexion peut être parfaite pour le mail et inutilisable pour un appel vidéo. WifiManager note votre lien pour chaque usage, pour que vous le sachiez avant que ça lâche.</span><span class="zh">同一條連線可能收信完美、視訊卻完全不能用。WifiManager 會針對每種用途為你的連線評分，讓你在它出問題之前就知道。</span></p>
   </div>
   <div class="scores">
-    <div class="score"><div class="e">✉️</div><div class="t">Email</div><div class="b" style="width:100%"></div></div>
-    <div class="score"><div class="e">🌐</div><div class="t">Browsing</div><div class="b" style="width:92%"></div></div>
-    <div class="score"><div class="e">🎥</div><div class="t">Video call</div><div class="b" style="width:74%"></div></div>
-    <div class="score"><div class="e">🎮</div><div class="t">Gaming</div><div class="b" style="width:58%"></div></div>
-    <div class="score"><div class="e">📺</div><div class="t">Streaming</div><div class="b" style="width:86%"></div></div>
+    <div class="score"><div class="e">✉️</div><div class="t"><span class="en">Email</span><span class="fr">E-mail</span><span class="zh">電子郵件</span></div><div class="b" style="width:100%"></div></div>
+    <div class="score"><div class="e">🌐</div><div class="t"><span class="en">Browsing</span><span class="fr">Navigation</span><span class="zh">瀏覽網頁</span></div><div class="b" style="width:92%"></div></div>
+    <div class="score"><div class="e">🎥</div><div class="t"><span class="en">Video call</span><span class="fr">Appel vidéo</span><span class="zh">視訊通話</span></div><div class="b" style="width:74%"></div></div>
+    <div class="score"><div class="e">🎮</div><div class="t"><span class="en">Gaming</span><span class="fr">Jeu</span><span class="zh">遊戲</span></div><div class="b" style="width:58%"></div></div>
+    <div class="score"><div class="e">📺</div><div class="t"><span class="en">Streaming</span><span class="fr">Streaming</span><span class="zh">串流</span></div><div class="b" style="width:86%"></div></div>
   </div>
 </div></section>
 
 <section id="screens"><div class="wrap">
   <div class="center">
-    <p class="eyebrow">a look inside</p>
-    <h2>Simple on the surface</h2>
-    <p class="lead">A glanceable popover and a focused Preferences window — bilingual, accessible, and out of your way.</p>
+    <p class="eyebrow"><span class="en">a look inside</span><span class="fr">un aperçu</span><span class="zh">內部一覽</span></p>
+    <h2><span class="en">Simple on the surface</span><span class="fr">Simple en surface</span><span class="zh">表面單純</span></h2>
+    <p class="lead"><span class="en">A glanceable popover and a focused Preferences window — bilingual, accessible, and out of your way.</span><span class="fr">Un popover lisible d'un coup d'œil et une fenêtre de préférences resserrée — bilingue, accessible, et discrète.</span><span class="zh">一眼可讀的彈出視窗，加上一個聚焦的偏好設定視窗——雙語、易於存取，而且不擋路。</span></p>
   </div>
   <div class="gallery">
     <figure>
       <img src="https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/Screenshots/popover.png" alt="WifiManager popover with live metrics and usage scores" loading="lazy">
-      <figcaption><b>Menu bar popover</b> — SSID, live metrics, per-use scores and the nearby network list.</figcaption>
+      <figcaption><span class="en"><b>Menu bar popover</b> — SSID, live metrics, per-use scores and the nearby network list.</span><span class="fr"><b>Popover en barre de menus</b> — SSID, mesures en direct, notes par usage et liste des réseaux proches.</span><span class="zh"><b>選單列彈出視窗</b> — SSID、即時指標、各用途評分，以及附近網路清單。</span></figcaption>
     </figure>
     <figure>
       <img src="https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/Screenshots/settings.png" alt="WifiManager Preferences window" loading="lazy">
-      <figcaption><b>Preferences</b> — notifications, auto-reconnect, location profiles and the FR / EN switch.</figcaption>
+      <figcaption><span class="en"><b>Preferences</b> — notifications, auto-reconnect, location profiles and the FR / EN switch.</span><span class="fr"><b>Préférences</b> — notifications, reconnexion automatique, profils de lieu et bascule FR / EN.</span><span class="zh"><b>偏好設定</b> — 通知、自動重連、地點設定檔，以及 FR／EN 語言切換。</span></figcaption>
     </figure>
   </div>
 </div></section>
 
 <section id="install"><div class="wrap">
   <div class="center">
-    <p class="eyebrow">get started</p>
-    <h2>Up and running in 30 seconds</h2>
-    <p class="lead">Notarized by Apple — it launches by double-click, no configuration needed.</p>
+    <p class="eyebrow"><span class="en">get started</span><span class="fr">démarrer</span><span class="zh">開始使用</span></p>
+    <h2><span class="en">Up and running in 30 seconds</span><span class="fr">Opérationnel en 30 secondes</span><span class="zh">30 秒內開始使用</span></h2>
+    <p class="lead"><span class="en">Notarized by Apple — it launches by double-click, no configuration needed.</span><span class="fr">Notariée par Apple — elle se lance d'un double-clic, sans configuration.</span><span class="zh">已通過 Apple 公證——按兩下即可啟動，不需任何設定。</span></p>
   </div>
   <div class="steps">
-    <div class="step"><h3>Download</h3><p>Grab the latest signed <code>.dmg</code> from GitHub Releases and open it.</p></div>
-    <div class="step"><h3>Install</h3><p>Drag <code>WifiManager.app</code> into <code>/Applications</code>.</p></div>
-    <div class="step"><h3>Launch</h3><p>Open it — the color-coded icon appears in your menu bar. That's it.</p></div>
+    <div class="step"><h3><span class="en">Download</span><span class="fr">Télécharger</span><span class="zh">下載</span></h3><p><span class="en">Grab the latest signed <code>.dmg</code> from GitHub Releases and open it.</span><span class="fr">Récupérez le dernier <code>.dmg</code> signé depuis GitHub Releases et ouvrez-le.</span><span class="zh">從 GitHub Releases 取得最新的已簽章 <code>.dmg</code> 並開啟。</span></p></div>
+    <div class="step"><h3><span class="en">Install</span><span class="fr">Installer</span><span class="zh">安裝</span></h3><p><span class="en">Drag <code>WifiManager.app</code> into <code>/Applications</code>.</span><span class="fr">Glissez <code>WifiManager.app</code> dans <code>/Applications</code>.</span><span class="zh">將 <code>WifiManager.app</code> 拖入 <code>/Applications</code>。</span></p></div>
+    <div class="step"><h3><span class="en">Launch</span><span class="fr">Lancer</span><span class="zh">啟動</span></h3><p><span class="en">Open it — the color-coded icon appears in your menu bar. That's it.</span><span class="fr">Ouvrez-la — l'icône colorée apparaît dans la barre de menus. C'est tout.</span><span class="zh">開啟它——彩色圖示就會出現在選單列。就這樣。</span></p></div>
   </div>
 </div></section>
 
 <section class="final"><div class="wrap">
-  <p class="eyebrow">ready?</p>
-  <h2>Take control of your WiFi</h2>
-  <p class="lead" style="margin:0 auto 6px">Free, open-source, bilingual and auto-updating. macOS 14 Sonoma or later.</p>
+  <p class="eyebrow"><span class="en">ready?</span><span class="fr">prêt ?</span><span class="zh">準備好了嗎？</span></p>
+  <h2><span class="en">Take control of your WiFi</span><span class="fr">Reprenez la main sur votre WiFi</span><span class="zh">把 WiFi 的主導權拿回來</span></h2>
+  <p class="lead" style="margin:0 auto 6px"><span class="en">Free, open-source, bilingual and auto-updating. macOS 14 Sonoma or later.</span><span class="fr">Gratuite, open source, bilingue et auto-mise à jour. macOS 14 Sonoma ou ultérieur.</span><span class="zh">免費、開源、雙語介面並可自動更新。macOS 14 Sonoma 或以上版本。</span></p>
   <div class="cta">
-    <a class="btn btn-primary" href="https://github.com/vincentlauriat/WifiManager/releases/latest">⬇︎ Download for macOS</a>
-    <a class="btn btn-ghost" href="https://github.com/vincentlauriat/WifiManager#readme">Read the docs</a>
+    <a class="btn btn-primary" href="https://github.com/vincentlauriat/WifiManager/releases/latest">⬇︎ <span class="en">Download for macOS</span><span class="fr">Télécharger pour macOS</span><span class="zh">下載 macOS 版</span></a>
+    <a class="btn btn-ghost" href="https://github.com/vincentlauriat/WifiManager#readme"><span class="en">Read the docs</span><span class="fr">Lire la doc</span><span class="zh">閱讀說明文件</span></a>
   </div>
 </div></section>
 
 <footer><div class="wrap">
-  WifiManager · MIT License · © 2026 Vincent Lauriat ·
+  WifiManager · <span class="en">MIT License</span><span class="fr">Licence MIT</span><span class="zh">MIT 授權</span> · © 2026 Vincent Lauriat ·
   <a href="https://github.com/vincentlauriat/WifiManager">github.com/vincentlauriat/WifiManager</a>
   · <a href="https://lauriat.fr/outils/wifimanager/">lauriat.fr</a>
 </div></footer>
 
+<script>
+  /* zh-Hant et non zh : sur un système configuré en chinois simplifié, un
+     simple `zh` laisse le navigateur choisir une fonte Han simplifiée, qui
+     rend certains caractères traditionnels dans la mauvaise forme. */
+  var LANG_TAG={en:'en',fr:'fr',zh:'zh-Hant'};
+  function setLang(l){
+    if(!LANG_TAG[l]) l='en';
+    document.body.classList.remove('lang-en','lang-fr','lang-zh');
+    document.body.classList.add('lang-'+l);
+    document.documentElement.lang=LANG_TAG[l];
+    /* On boucle sur les boutons au lieu de les nommer un par un : ajouter une
+       4e langue ne demandera alors aucune retouche de ce script. */
+    document.querySelectorAll('.langtog button').forEach(function(b){
+      var on=b.dataset.lang===l;
+      b.classList.toggle('on',on);
+      b.setAttribute('aria-pressed',on?'true':'false');
+    });
+    try{localStorage.setItem('vl-lang',l)}catch(e){}
+  }
+  (function(){
+    var saved;try{saved=localStorage.getItem('vl-lang')}catch(e){}
+    var n=(navigator.language||'en').slice(0,2).toLowerCase();
+    /* Le traditionnel est servi a tout visiteur sinophone, y compris zh-CN :
+       c'est la seule variante chinoise disponible, et la renvoyer vaut mieux
+       que de rabattre ce visiteur sur l'anglais. */
+    setLang(saved||(n==='zh'?'zh':(n==='fr'?'fr':'en')));
+  })();
+</script>
 </body>
 </html>

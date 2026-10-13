@@ -1,0 +1,357 @@
+{
+  "name": "WifiManager",
+  "no": "16",
+  "repo": "vincentlauriat/WifiManager",
+  "url": "https://vincentlauriat.github.io/WifiManager/",
+  "accent": "#0891b2",
+  "meta": {
+    "title": "WifiManager — Know exactly what your WiFi can handle",
+    "description": "A lightweight macOS menu bar app that monitors WiFi quality in real time, tells real networks apart from iPhone hotspots, and scores your connection per use case — video calls, gaming, streaming. Free & open-source (MIT).",
+    "favicon": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230891b2'/%3E%3Cg fill='none' stroke='white' stroke-width='7' stroke-linecap='round'%3E%3Cpath d='M30 52 a28 28 0 0 1 40 0'/%3E%3Cpath d='M40 63 a14 14 0 0 1 20 0'/%3E%3C/g%3E%3Ccircle cx='50' cy='73' r='5.5' fill='white'/%3E%3C/svg%3E",
+    "og_image": "https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/Screenshots/popover.png"
+  },
+  "role": {
+    "en": "Real networks vs iPhone hotspots — told apart automatically",
+    "fr": "Vrais réseaux et partages de connexion iPhone — distingués automatiquement",
+    "zh": "真實網路與 iPhone 個人熱點——自動分辨"
+  },
+  "thesis": {
+    "en": "Know what your WiFi can handle.",
+    "fr": "Sachez ce que votre WiFi encaisse vraiment.",
+    "zh": "搞清楚你的 WiFi 撐得住什麼。"
+  },
+  "lede": {
+    "en": "A lightweight menu bar app that measures your WiFi quality in real time, detects iPhone Personal Hotspots, and scores your connection for what you're actually doing — a video call, a game, a stream.",
+    "fr": "Une app légère en barre de menus qui mesure la qualité de votre WiFi en temps réel, détecte les partages de connexion iPhone, et note votre lien pour ce que vous faites vraiment — un appel vidéo, une partie, un stream.",
+    "zh": "輕量的選單列應用程式，即時量測你的 WiFi 品質、偵測 iPhone 個人熱點，並針對你當下實際在做的事評分——視訊通話、遊戲、串流。"
+  },
+  "actions": [
+    {
+      "primary": true,
+      "href": "https://github.com/vincentlauriat/WifiManager/releases/latest",
+      "label": {
+        "en": "Download for macOS",
+        "fr": "Télécharger pour macOS",
+        "zh": "下載 macOS 版"
+      }
+    },
+    {
+      "href": "https://github.com/vincentlauriat/WifiManager",
+      "label": {
+        "en": "View on GitHub",
+        "fr": "Voir sur GitHub",
+        "zh": "在 GitHub 上檢視"
+      }
+    }
+  ],
+  "facts": [
+    {
+      "k": {
+        "en": "Requires",
+        "fr": "Configuration",
+        "zh": "系統需求"
+      },
+      "v": "macOS 14+"
+    },
+    {
+      "k": {
+        "en": "Distribution",
+        "fr": "Distribution",
+        "zh": "發行"
+      },
+      "v": {
+        "en": "Signed &amp; notarized",
+        "fr": "Signé et notarié",
+        "zh": "已簽章與公證"
+      }
+    },
+    {
+      "k": {
+        "en": "App languages",
+        "fr": "Langues de l'app",
+        "zh": "應用程式語言"
+      },
+      "v": {
+        "en": "FR / EN",
+        "fr": "FR / EN",
+        "zh": "應用程式語言 FR / EN"
+      }
+    },
+    {
+      "k": {
+        "en": "Licence",
+        "fr": "Licence",
+        "zh": "授權"
+      },
+      "v": {
+        "en": "Free &amp; open-source (MIT)",
+        "fr": "Gratuit et open source (MIT)",
+        "zh": "免費開源（MIT）"
+      }
+    }
+  ],
+  "hero": {
+    "src": "https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/Screenshots/popover.png",
+    "w": 650,
+    "h": 860,
+    "alt": "WifiManager menu bar popover showing live signal metrics and per-use quality scores",
+    "caption": {
+      "en": "<b>Menu bar popover</b> — SSID, live metrics, per-use scores and the nearby network list.",
+      "fr": "<b>Popover en barre de menus</b> — SSID, mesures en direct, notes par usage et liste des réseaux proches.",
+      "zh": "<b>選單列彈出視窗</b> — SSID、即時指標、各用途評分，以及附近網路清單。"
+    }
+  },
+  "opener": {
+    "h": {
+      "en": "More than a signal bar",
+      "fr": "Plus qu'une barre de signal",
+      "zh": "不只是一格訊號"
+    },
+    "p": {
+      "en": "CoreWLAN under the hood, a clean SwiftUI popover on top. Everything you need to understand — and fix — a flaky connection.",
+      "fr": "CoreWLAN sous le capot, un popover SwiftUI net au-dessus. Tout pour comprendre — et réparer — une connexion capricieuse.",
+      "zh": "底層是 CoreWLAN，上層是簡潔的 SwiftUI 彈出視窗。理解並修好一條不穩定連線所需的一切。"
+    }
+  },
+  "features": [
+    {
+      "h": {
+        "en": "Live signal metrics",
+        "fr": "Mesures de signal en direct",
+        "zh": "即時訊號指標"
+      },
+      "p": {
+        "en": "RSSI, latency, link speed and SNR with animated bars, updated event-driven via CoreWLAN.",
+        "fr": "RSSI, latence, débit du lien et SNR en barres animées, mis à jour par événements via CoreWLAN.",
+        "zh": "RSSI、延遲、連線速率與 SNR，以動態長條呈現，透過 CoreWLAN 事件驅動更新。"
+      }
+    },
+    {
+      "h": {
+        "en": "Hotspot detection",
+        "fr": "Détection de partage de connexion",
+        "zh": "熱點偵測"
+      },
+      "p": {
+        "en": "Spots an iPhone Personal Hotspot automatically via <code>NWPathMonitor</code> — and skips the speed test to save your data.",
+        "fr": "Repère automatiquement un partage de connexion iPhone via <code>NWPathMonitor</code> — et saute le test de débit pour épargner votre forfait.",
+        "zh": "透過 <code>NWPathMonitor</code> 自動辨識 iPhone 個人熱點——並跳過速度測試以節省你的行動數據。"
+      }
+    },
+    {
+      "h": {
+        "en": "Download speed test",
+        "fr": "Test de débit descendant",
+        "zh": "下載速度測試"
+      },
+      "p": {
+        "en": "Optional real throughput measurement when you want the full picture.",
+        "fr": "Mesure de débit réel optionnelle, quand vous voulez l'image complète.",
+        "zh": "需要完整資訊時，可選擇進行實際吞吐量量測。"
+      }
+    },
+    {
+      "h": {
+        "en": "Network scanner",
+        "fr": "Scanner de réseaux",
+        "zh": "網路掃描"
+      },
+      "p": {
+        "en": "Lists nearby networks grouped by SSID with an AP-count badge; join directly with a password prompt.",
+        "fr": "Liste les réseaux proches groupés par SSID avec un badge du nombre de bornes ; rejoignez directement avec une demande de mot de passe.",
+        "zh": "列出附近的網路並依 SSID 分組，附上 AP 數量標籤；可直接連線並輸入密碼。"
+      }
+    },
+    {
+      "h": {
+        "en": "Location auto-switch",
+        "fr": "Bascule automatique par lieu",
+        "zh": "依地點自動切換"
+      },
+      "p": {
+        "en": "Capture a location and auto-switch to its preferred SSID on arrival — opt-in, via CoreLocation.",
+        "fr": "Enregistrez un lieu et basculez automatiquement sur son SSID préféré à l'arrivée — sur activation, via CoreLocation.",
+        "zh": "記錄一個地點，抵達時自動切換到該地點偏好的 SSID——需自行啟用，透過 CoreLocation。"
+      }
+    },
+    {
+      "h": {
+        "en": "Auto-reconnect",
+        "fr": "Reconnexion automatique",
+        "zh": "自動重連"
+      },
+      "p": {
+        "en": "Retries the connection when dropped, at a configurable interval. Toggle WiFi from the popover.",
+        "fr": "Retente la connexion en cas de coupure, à un intervalle configurable. Activez ou coupez le WiFi depuis le popover.",
+        "zh": "斷線時會依可設定的間隔重試連線。也可從彈出視窗直接開關 WiFi。"
+      }
+    },
+    {
+      "h": {
+        "en": "Smart notifications",
+        "fr": "Notifications intelligentes",
+        "zh": "智慧通知"
+      },
+      "p": {
+        "en": "Optional alerts on connection loss and when you switch onto a hotspot — never silent.",
+        "fr": "Alertes optionnelles en cas de perte de connexion et lors du passage sur un partage de connexion — jamais silencieux.",
+        "zh": "可選擇在斷線以及切換到熱點時發出提醒——不會默不作聲。"
+      }
+    },
+    {
+      "h": {
+        "en": "Launch at login &amp; auto-update",
+        "fr": "Lancement à la session et mise à jour auto",
+        "zh": "開機啟動與自動更新"
+      },
+      "p": {
+        "en": "<code>SMAppService</code> start-up plus Sparkle 2 update prompts — you're always in control.",
+        "fr": "Démarrage via <code>SMAppService</code> et propositions de mise à jour Sparkle 2 — vous gardez la main.",
+        "zh": "以 <code>SMAppService</code> 啟動，並由 Sparkle 2 詢問更新——主導權始終在你手上。"
+      }
+    },
+    {
+      "h": {
+        "en": "Color-coded icon",
+        "fr": "Icône codée par couleur",
+        "zh": "彩色狀態圖示"
+      },
+      "p": {
+        "en": "Green / orange / red menu bar icon with a searching-pulse animation. Hide the native macOS WiFi icon and use this instead.",
+        "fr": "Icône verte / orange / rouge en barre de menus, avec une pulsation pendant la recherche. Masquez l'icône WiFi native de macOS et utilisez celle-ci.",
+        "zh": "綠／橙／紅三色的選單列圖示，搜尋時會有脈動動畫。你可以隱藏 macOS 原生的 WiFi 圖示，改用這一個。"
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "scores",
+      "h": {
+        "en": "Is it good enough for <em>this</em>?",
+        "fr": "Est-ce assez bon pour <em>ça</em> ?",
+        "zh": "這條連線撐得住<em>這件事</em>嗎？"
+      },
+      "p": {
+        "en": "The same connection can be perfect for email and useless for a video call. WifiManager rates your link for each use case, so you know before it fails.",
+        "fr": "La même connexion peut être parfaite pour le mail et inutilisable pour un appel vidéo. WifiManager note votre lien pour chaque usage, pour que vous le sachiez avant que ça lâche.",
+        "zh": "同一條連線可能收信完美、視訊卻完全不能用。WifiManager 會針對每種用途為你的連線評分，讓你在它出問題之前就知道。"
+      },
+      "blocks": [
+        {
+          "type": "p",
+          "t": {
+            "en": "Email · Browsing · Video call · Gaming · Streaming",
+            "fr": "E-mail · Navigation · Appel vidéo · Jeu · Streaming",
+            "zh": "電子郵件 · 瀏覽網頁 · 視訊通話 · 遊戲 · 串流"
+          }
+        }
+      ]
+    },
+    {
+      "id": "screens",
+      "h": {
+        "en": "Simple on the surface",
+        "fr": "Simple en surface",
+        "zh": "表面單純"
+      },
+      "p": {
+        "en": "A glanceable popover and a focused Preferences window — bilingual, accessible, and out of your way.",
+        "fr": "Un popover lisible d'un coup d'œil et une fenêtre de préférences resserrée — bilingue, accessible, et discrète.",
+        "zh": "一眼可讀的彈出視窗，加上一個聚焦的偏好設定視窗——雙語、易於存取，而且不擋路。"
+      },
+      "blocks": [
+        {
+          "type": "plates",
+          "items": [
+            {
+              "src": "https://raw.githubusercontent.com/vincentlauriat/WifiManager/main/Screenshots/settings.png",
+              "w": 848,
+              "h": 1146,
+              "alt": "WifiManager Preferences window",
+              "caption": {
+                "en": "<b>Preferences</b> — notifications, auto-reconnect, location profiles and the FR / EN switch.",
+                "fr": "<b>Préférences</b> — notifications, reconnexion automatique, profils de lieu et bascule FR / EN.",
+                "zh": "<b>偏好設定</b> — 通知、自動重連、地點設定檔，以及 FR／EN 語言切換。"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "install",
+      "h": {
+        "en": "Up and running in 30 seconds",
+        "fr": "Opérationnel en 30 secondes",
+        "zh": "30 秒內開始使用"
+      },
+      "p": {
+        "en": "Notarized by Apple — it launches by double-click, no configuration needed.",
+        "fr": "Notariée par Apple — elle se lance d'un double-clic, sans configuration.",
+        "zh": "已通過 Apple 公證——按兩下即可啟動，不需任何設定。"
+      },
+      "blocks": [
+        {
+          "type": "steps",
+          "items": [
+            {
+              "en": "<b>Download.</b> Grab the latest signed <code>.dmg</code> from GitHub Releases and open it.",
+              "fr": "<b>Télécharger.</b> Récupérez le dernier <code>.dmg</code> signé depuis GitHub Releases et ouvrez-le.",
+              "zh": "<b>下載。</b> 從 GitHub Releases 取得最新的已簽章 <code>.dmg</code> 並開啟。"
+            },
+            {
+              "en": "<b>Install.</b> Drag <code>WifiManager.app</code> into <code>/Applications</code>.",
+              "fr": "<b>Installer.</b> Glissez <code>WifiManager.app</code> dans <code>/Applications</code>.",
+              "zh": "<b>安裝。</b> 將 <code>WifiManager.app</code> 拖入 <code>/Applications</code>。"
+            },
+            {
+              "en": "<b>Launch.</b> Open it — the color-coded icon appears in your menu bar. That's it.",
+              "fr": "<b>Lancer.</b> Ouvrez-la — l'icône colorée apparaît dans la barre de menus. C'est tout.",
+              "zh": "<b>啟動。</b> 開啟它——彩色圖示就會出現在選單列。就這樣。"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "close": {
+    "h": {
+      "en": "Take control of your WiFi",
+      "fr": "Reprenez la main sur votre WiFi",
+      "zh": "把 WiFi 的主導權拿回來"
+    },
+    "p": {
+      "en": "Free, open-source, bilingual and auto-updating. macOS 14 Sonoma or later.",
+      "fr": "Gratuite, open source, bilingue et auto-mise à jour. macOS 14 Sonoma ou ultérieur.",
+      "zh": "免費、開源、雙語介面並可自動更新。macOS 14 Sonoma 或以上版本。"
+    },
+    "actions": [
+      {
+        "primary": true,
+        "href": "https://github.com/vincentlauriat/WifiManager/releases/latest",
+        "label": {
+          "en": "Download for macOS",
+          "fr": "Télécharger pour macOS",
+          "zh": "下載 macOS 版"
+        }
+      },
+      {
+        "href": "https://github.com/vincentlauriat/WifiManager#readme",
+        "label": {
+          "en": "Read the docs",
+          "fr": "Lire la doc",
+          "zh": "閱讀說明文件"
+        }
+      }
+    ]
+  },
+  "colophon": {
+    "notes": [
+      {
+        "en": "Also at <a href=\"https://lauriat.fr/outils/wifimanager/\">lauriat.fr</a>.",
+        "fr": "Aussi sur <a href=\"https://lauriat.fr/outils/wifimanager/\">lauriat.fr</a>.",
+        "zh": "另見 <a href=\"https://lauriat.fr/outils/wifimanager/\">lauriat.fr</a>。"
+      }
+    ]
+  }
+}
